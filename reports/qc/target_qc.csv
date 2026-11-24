@@ -1,0 +1,44 @@
+park_id,park_name,state,tier,capacity_mw,hours,missing_pct,cf_2025_pct,cf_clearsky_2025_pct,cf_monsoon_jjas_pct,cf_premonsoon_mam_pct,energy_2025_gwh,max_p_norm,clipped_daylight_pct,night_nonzero,k_gt_1p05_pct,ramp_hours_dk_gt_0p3
+P35,Bhadla-II Solar Park,Rajasthan,U2_core,680,21768,0.0,24.27,25.73,21.12,26.89,1445.6,1.0,0.05,0,5.43,82
+P37,Bhadla-IV Solar Park,Rajasthan,U2_core,500,21768,0.0,24.27,25.73,21.12,26.89,1062.9,1.0,0.05,0,5.43,82
+P36,Bhadla-III Solar Park,Rajasthan,U2_core,1000,21768,0.0,24.27,25.73,21.12,26.89,2125.8,1.0,0.05,0,5.43,82
+P40,Nokh Solar Park,Rajasthan,U3_virtual,925,21768,0.0,24.19,25.79,20.92,26.88,1959.9,1.0,0.05,0,4.45,67
+P39,Fatehgarh Phase-1B Solar Park,Rajasthan,U2_core,421,21768,0.0,24.16,25.72,20.26,27.1,890.9,1.0,0.04,0,7.15,62
+P41,Pugal Solar Park Ph-I,Rajasthan,U3_virtual,1000,21768,0.0,23.99,25.73,21.01,26.67,2101.2,1.0,0.04,0,3.76,72
+P42,Pugal Solar Park Ph-II,Rajasthan,U3_virtual,1000,21768,0.0,23.99,25.73,21.01,26.67,2101.2,1.0,0.04,0,3.76,72
+P38,Phalodi-Pokaran Solar Park,Rajasthan,U2_core,300,21768,0.0,23.94,25.95,19.97,27.02,629.1,1.0,0.06,0,4.73,82
+P09,NTPC RE Park,Gujarat,U3_virtual,4750,21768,0.0,23.06,25.68,17.48,27.29,9595.0,0.9949,0.03,0,6.58,42
+P11,GIPCL RE Park Ph-I,Gujarat,U3_virtual,600,21768,0.0,23.06,25.68,17.48,27.29,1212.0,0.9949,0.03,0,6.58,42
+P10,GSECL RE Park,Gujarat,U3_virtual,3325,21768,0.0,23.06,25.68,17.48,27.29,6716.5,0.9949,0.03,0,6.58,42
+P12,GIPCL RE Park Ph-II,Gujarat,U3_virtual,1200,21768,0.0,23.06,25.68,17.48,27.29,2424.0,0.9949,0.03,0,6.58,42
+P13,GIPCL RE Park Ph-III,Gujarat,U3_virtual,575,21768,0.0,23.06,25.68,17.48,27.29,1161.5,0.9949,0.03,0,6.58,42
+P07,Radhnesada Solar Park,Gujarat,U2_core,500,21768,0.0,22.39,25.45,16.51,26.81,980.7,0.9906,0.01,0,5.62,76
+P23,Neemuch Solar Park,Madhya Pradesh,U3_virtual,500,21768,0.0,22.28,26.59,15.65,26.92,975.9,1.0,0.06,0,2.88,115
+P47,Kalpi Solar Park,Uttar Pradesh,U2_core,26,21768,0.0,22.11,25.87,16.81,26.3,50.4,1.0,0.04,0,3.3,88
+P44,Solar Park in UP (LSPDCL),Uttar Pradesh,U2_core,240,21768,0.0,22.08,25.87,16.74,26.3,464.1,1.0,0.04,0,3.34,157
+P45,Jalaun Solar Park,Uttar Pradesh,U3_virtual,1200,21768,0.0,22.07,25.88,16.74,26.3,2319.9,1.0,0.04,0,3.3,156
+P49,Jhansi Solar Park,Uttar Pradesh,U3_virtual,600,21768,0.0,21.99,25.84,16.13,26.33,1155.7,1.0,0.04,0,3.81,125
+P50,Chitrakoot Solar Park,Uttar Pradesh,U3_virtual,800,21768,0.0,21.79,25.99,16.2,25.8,1526.8,1.0,0.04,0,2.6,95
+P27,Chhatarpur Solar Park,Madhya Pradesh,U3_virtual,950,21768,0.0,21.7,26.12,15.54,25.93,1805.5,1.0,0.04,0,2.89,85
+P28,Barethi Solar Park,Madhya Pradesh,U3_virtual,630,21768,0.0,21.69,26.09,15.54,25.92,1196.9,1.0,0.04,0,2.91,86
+P08,Dholera Solar Park,Gujarat,U2_core,300,21768,0.0,21.64,25.82,15.09,26.14,568.8,0.9935,0.01,0,2.15,70
+P22,Mandsaur Solar Park,Madhya Pradesh,U2_core,250,21768,0.0,21.62,26.38,14.49,26.47,473.6,1.0,0.02,0,2.88,123
+P48,Lalitpur Solar Park,Uttar Pradesh,U3_virtual,600,21768,0.0,21.62,26.23,14.95,26.18,1136.3,1.0,0.04,0,3.09,140
+P46,Mirzapur Solar Park,Uttar Pradesh,U3_virtual,100,21768,0.0,21.59,26.21,16.22,25.47,189.1,1.0,0.07,0,2.13,123
+P21,Rewa Ultra Mega Solar Park,Madhya Pradesh,U2_core,750,21768,0.0,21.47,26.35,15.58,25.45,1410.9,1.0,0.05,0,2.09,129
+P24,Agar Solar Park,Madhya Pradesh,U3_virtual,550,21768,0.0,21.38,26.59,13.89,26.26,1030.3,1.0,0.02,0,2.61,123
+P31,Vankal Solar Park,Mizoram,U2_core,20,21768,0.0,21.37,28.68,16.02,23.35,37.4,1.0,0.09,0,0.74,213
+P25,Shajapur Solar Park,Madhya Pradesh,U3_virtual,450,21768,0.0,21.25,26.49,13.68,25.99,837.5,1.0,0.02,0,2.83,164
+P29,Sai Guru Solar Park,Maharashtra,U3_virtual,500,21768,0.0,21.23,26.61,13.89,25.2,930.0,0.9919,0.01,0,2.09,33
+P17,Pavagada Solar Park,Karnataka,U2_core,2000,21768,0.0,21.22,26.74,16.8,23.92,3717.5,0.9816,0.0,0,2.03,118
+P05,Ramagiri Solar Park,Andhra Pradesh,U3_virtual,300,21768,0.0,21.2,26.61,16.78,23.89,557.0,0.9807,0.0,0,2.28,122
+P30,Dondaicha Solar Park,Maharashtra,U3_virtual,250,21768,0.0,21.11,25.93,13.7,25.19,462.3,0.9798,0.0,0,2.96,55
+P01,Ananthapuramu-I Solar Park (NP Kunta),Andhra Pradesh,U2_core,1400,21768,0.0,21.03,26.36,17.83,23.63,2579.7,0.9791,0.0,0,2.59,110
+P06,Rajnandgaon Solar Park,Chhattisgarh,U3_virtual,100,21768,0.0,20.86,26.12,14.35,24.43,182.7,0.9883,0.0,0,2.05,98
+P14,SECI Floating Solar Park,Jharkhand,U3_virtual,100,21768,0.0,20.78,26.67,15.85,25.4,182.0,1.0,0.05,0,1.58,172
+P04,Ananthapuramu-II Solar Park,Andhra Pradesh,U2_core,500,21768,0.0,20.75,26.01,16.24,23.71,908.8,0.9527,0.0,0,2.11,149
+P03,Kadapa Solar Park,Andhra Pradesh,U2_core,250,21768,0.0,20.71,25.95,16.4,23.7,453.6,0.9535,0.0,0,2.32,129
+P02,Kurnool Ultra Mega Solar Park,Andhra Pradesh,U2_core,1000,21768,0.0,20.7,26.24,15.57,23.88,1813.3,0.9503,0.0,0,1.57,97
+P26,Omkareshwar Floating Solar Park,Madhya Pradesh,U3_virtual,600,21768,0.0,20.55,25.68,14.28,26.17,1080.2,0.9853,0.0,0,3.74,77
+P16,DVC Floating Solar Park Ph-II,Jharkhand,U3_virtual,234,21768,0.0,20.35,25.65,16.21,24.57,417.1,0.9788,0.0,0,1.69,140
+P19,Kasargod Solar Park,Kerala,U2_core,100,21768,0.0,19.84,26.61,14.3,21.36,173.8,0.9427,0.0,0,0.51,97

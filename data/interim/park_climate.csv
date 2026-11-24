@@ -1,0 +1,44 @@
+park_id,park_name,state,grid_region,loc_id,koppen,koppen_name,cluster
+P01,Ananthapuramu-I Solar Park (NP Kunta),Andhra Pradesh,Southern,L01,BSh,hot semi-arid,C5
+P02,Kurnool Ultra Mega Solar Park,Andhra Pradesh,Southern,L02,BSh,hot semi-arid,C5
+P03,Kadapa Solar Park,Andhra Pradesh,Southern,L03,BSh,hot semi-arid,C5
+P04,Ananthapuramu-II Solar Park,Andhra Pradesh,Southern,L04,BSh,hot semi-arid,C5
+P05,Ramagiri Solar Park,Andhra Pradesh,Southern,L05,BSh,hot semi-arid,C5
+P06,Rajnandgaon Solar Park,Chhattisgarh,Western,L06,Aw,tropical savanna,C1
+P07,Radhnesada Solar Park,Gujarat,Western,L07,BSh,hot semi-arid,C4
+P08,Dholera Solar Park,Gujarat,Western,L08,BSh,hot semi-arid,C1
+P09,NTPC RE Park,Gujarat,Western,L09,BWh,hot desert,C4
+P10,GSECL RE Park,Gujarat,Western,L09,BWh,hot desert,C4
+P11,GIPCL RE Park Ph-I,Gujarat,Western,L09,BWh,hot desert,C4
+P12,GIPCL RE Park Ph-II,Gujarat,Western,L09,BWh,hot desert,C4
+P13,GIPCL RE Park Ph-III,Gujarat,Western,L09,BWh,hot desert,C4
+P14,SECI Floating Solar Park,Jharkhand,Eastern,L10,Cwa,"humid subtropical, dry winter",C1
+P16,DVC Floating Solar Park Ph-II,Jharkhand,Eastern,L11,Aw,tropical savanna,C1
+P17,Pavagada Solar Park,Karnataka,Southern,L12,BSh,hot semi-arid,C5
+P19,Kasargod Solar Park,Kerala,Southern,L13,Am,tropical monsoon,C2
+P21,Rewa Ultra Mega Solar Park,Madhya Pradesh,Western,L14,Csa,"Mediterranean, hot summer",C1
+P22,Mandsaur Solar Park,Madhya Pradesh,Western,L15,Cwa,"humid subtropical, dry winter",C1
+P23,Neemuch Solar Park,Madhya Pradesh,Western,L16,BSh,hot semi-arid,C1
+P24,Agar Solar Park,Madhya Pradesh,Western,L17,Csa,"Mediterranean, hot summer",C1
+P25,Shajapur Solar Park,Madhya Pradesh,Western,L18,As,"tropical savanna, dry summer",C1
+P26,Omkareshwar Floating Solar Park,Madhya Pradesh,Western,L19,As,"tropical savanna, dry summer",C1
+P27,Chhatarpur Solar Park,Madhya Pradesh,Western,L20,Csa,"Mediterranean, hot summer",C1
+P28,Barethi Solar Park,Madhya Pradesh,Western,L21,Csa,"Mediterranean, hot summer",C1
+P29,Sai Guru Solar Park,Maharashtra,Western,L22,Aw,tropical savanna,C1
+P30,Dondaicha Solar Park,Maharashtra,Western,L23,BSh,hot semi-arid,C1
+P31,Vankal Solar Park,Mizoram,North-Eastern,L24,Cwb,"subtropical highland, dry winter",C3
+P35,Bhadla-II Solar Park,Rajasthan,Northern,L25,BWh,hot desert,C4
+P36,Bhadla-III Solar Park,Rajasthan,Northern,L25,BWh,hot desert,C4
+P37,Bhadla-IV Solar Park,Rajasthan,Northern,L25,BWh,hot desert,C4
+P38,Phalodi-Pokaran Solar Park,Rajasthan,Northern,L26,BWh,hot desert,C4
+P39,Fatehgarh Phase-1B Solar Park,Rajasthan,Northern,L27,BWh,hot desert,C4
+P40,Nokh Solar Park,Rajasthan,Northern,L28,BWh,hot desert,C4
+P41,Pugal Solar Park Ph-I,Rajasthan,Northern,L29,BWh,hot desert,C4
+P42,Pugal Solar Park Ph-II,Rajasthan,Northern,L29,BWh,hot desert,C4
+P44,Solar Park in UP (LSPDCL),Uttar Pradesh,Northern,L30,BSh,hot semi-arid,C1
+P45,Jalaun Solar Park,Uttar Pradesh,Northern,L31,BSh,hot semi-arid,C1
+P46,Mirzapur Solar Park,Uttar Pradesh,Northern,L32,Csa,"Mediterranean, hot summer",C1
+P47,Kalpi Solar Park,Uttar Pradesh,Northern,L33,BSh,hot semi-arid,C1
+P48,Lalitpur Solar Park,Uttar Pradesh,Northern,L34,Csa,"Mediterranean, hot summer",C1
+P49,Jhansi Solar Park,Uttar Pradesh,Northern,L35,BSh,hot semi-arid,C1
+P50,Chitrakoot Solar Park,Uttar Pradesh,Northern,L36,Csa,"Mediterranean, hot summer",C1

@@ -1,0 +1,723 @@
+<title>Solar Park Forecasting Guidebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky chapter index on the left, one reading column (~68ch) on the right; stacks on phones. */
+:root{
+  --bg:#F6F8FB; --paper:#FFFFFF; --ink:#1B2533; --muted:#5B6878; --line:#DCE3EC;
+  --navy:#1B3A5C; --sun:#C98A00; --sunbg:#FFF4D6; --teal:#1A7A6A; --tealbg:#E3F3EF; --rust:#C4552A; --rustbg:#FCE9E1; --blue:#2563A8; --bluebg:#E6EEF8;
+  --f-display:"Archivo","Segoe UI",system-ui,sans-serif; --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1621; --paper:#16202E; --ink:#E4EAF2; --muted:#9AA8BA; --line:#2A3748;
+  --navy:#9CC2EC; --sun:#F2B630; --sunbg:#3A2E10; --teal:#5CC7AF; --tealbg:#10302A; --rust:#F08A5E; --rustbg:#3A1E14; --blue:#7FB0EA; --bluebg:#15263C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1621; --paper:#16202E; --ink:#E4EAF2; --muted:#9AA8BA; --line:#2A3748;
+  --navy:#9CC2EC; --sun:#F2B630; --sunbg:#3A2E10; --teal:#5CC7AF; --tealbg:#10302A; --rust:#F08A5E; --rustbg:#3A1E14; --blue:#7FB0EA; --bluebg:#15263C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.65 var(--f-body);margin:0}
+.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px;max-width:1180px;margin:0 auto;padding-inline:24px;padding-block:32px 80px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px;padding-right:8px}
+nav.toc b{display:block;font:700 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:c}
+nav.toc li{counter-increment:c}
+nav.toc a{display:flex;gap:8px;padding:4px 0;color:var(--ink);text-decoration:none}
+nav.toc a::before{content:counter(c,decimal-leading-zero);font:12px/1.9 var(--f-mono);color:var(--sun)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--blue)}
+main{min-width:0}
+header.hero{padding:8px 0 28px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font:600 12px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sun)}
+h1{font:800 clamp(30px,5vw,46px)/1.1 var(--f-display);color:var(--navy);margin:10px 0 14px;text-wrap:balance}
+h2{font:800 clamp(24px,3.4vw,30px)/1.2 var(--f-display);color:var(--navy);margin:56px 0 12px;text-wrap:balance;scroll-margin-top:16px}
+h2 .n{font:600 14px var(--f-mono);color:var(--sun);display:block;letter-spacing:.08em;margin-bottom:4px}
+h3{font:700 19px/1.3 var(--f-display);color:var(--ink);margin:30px 0 8px;text-wrap:balance}
+p,li{max-width:70ch}
+p{margin:0 0 14px}
+ul,ol{padding-left:22px;margin:0 0 14px}
+li{margin:4px 0}
+a{color:var(--blue)}
+.lede{font-size:18px;color:var(--muted);max-width:64ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:14px;color:var(--muted);margin-top:16px}
+.meta strong{color:var(--ink)}
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+code{background:var(--bluebg);padding:1px 5px;border-radius:4px}
+.box{border-radius:10px;padding:14px 18px;margin:18px 0;max-width:74ch}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.box .t{font:700 13px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:block}
+.say{background:var(--tealbg)} .say .t{color:var(--teal)}
+.why{background:var(--sunbg)} .why .t{color:var(--sun)}
+.warn{background:var(--rustbg)} .warn .t{color:var(--rust)}
+.eg{background:var(--bluebg)} .eg .t{color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font:800 26px/1.1 var(--f-display);color:var(--navy);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.tbl{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;white-space:nowrap}
+tr.best td{background:var(--tealbg);font-weight:600}
+.cap{font-size:13px;color:var(--muted);margin-top:-10px;margin-bottom:18px}
+dl.gl{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr);gap:8px 20px;margin:16px 0}
+dl.gl dt{font-weight:600;color:var(--navy)}
+dl.gl dd{margin:0;color:var(--ink)}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding-left:44px;margin:14px 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--paper);font:700 14px/30px var(--f-display);text-align:center}
+.bars{margin:16px 0 20px;max-width:640px}
+.bar{display:grid;grid-template-columns:150px minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:13px;margin:5px 0}
+.bar i{display:block;height:14px;border-radius:3px;background:var(--blue)}
+.bar.g i{background:var(--muted)} .bar.t i{background:var(--teal)}
+.bar em{font:600 13px var(--f-mono);font-style:normal;text-align:right}
+pre.mermaid{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;margin:16px 0}
+pre.code{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono);margin:12px 0 18px}
+details{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin:10px 0;max-width:76ch}
+details summary{cursor:pointer;font-weight:600;color:var(--navy)}
+details[open] summary{margin-bottom:8px}
+details p:last-child{margin-bottom:0}
+.formula{font:15px var(--f-mono);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:12px 0;overflow-x:auto;max-width:74ch}
+hr{border:0;border-top:1px solid var(--line);margin:48px 0}
+footer{color:var(--muted);font-size:13px;margin-top:60px}
+@media (max-width:860px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-inline:16px}
+  nav.toc{position:static;max-height:none;border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--paper);margin-bottom:12px}
+  dl.gl{grid-template-columns:minmax(0,1fr)} dl.gl dd{margin-bottom:8px}
+  .bar{grid-template-columns:110px minmax(0,1fr) 48px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Chapters">
+  <b>Chapters</b>
+  <ol>
+    <li><a href="#big-picture">The project in one page</a></li>
+    <li><a href="#words">Words you must know</a></li>
+    <li><a href="#solar-basics">Solar power basics</a></li>
+    <li><a href="#parks">The MNRE solar parks</a></li>
+    <li><a href="#gap">Research gap and questions</a></li>
+    <li><a href="#data">Data sources</a></li>
+    <li><a href="#target">Making the "actual" power</a></li>
+    <li><a href="#no-cheat">The no-cheating rules</a></li>
+    <li><a href="#pipeline">The pipeline, script by script</a></li>
+    <li><a href="#features">Model inputs (features)</a></li>
+    <li><a href="#models">The models</a></li>
+    <li><a href="#testing">How we tested</a></li>
+    <li><a href="#results">Results, experiment by experiment</a></li>
+    <li><a href="#delivery">API, dashboard and website</a></li>
+    <li><a href="#files">Where everything lives</a></li>
+    <li><a href="#run">How to run it</a></li>
+    <li><a href="#limits">Limitations</a></li>
+    <li><a href="#future">Future scope</a></li>
+    <li><a href="#viva">Viva questions and answers</a></li>
+    <li><a href="#cheat">Numbers cheat sheet</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">B.Tech Research Project · EE Dept, NIT Patna</div>
+  <h1>Solar Park Forecasting Guidebook</h1>
+  <p class="lede">Everything about our project, explained from zero: what we built, why we built it that way, how every part works, what the results mean, and how to answer questions about it.</p>
+  <div class="meta">
+    <span><strong>Team:</strong> Himanshu Yadav (2302054), Ajeet Dhakad (2302066), Vikas Yadav (2302074)</span>
+    <span><strong>Guide:</strong> Dr. Aasim</span>
+  </div>
+</header>
+
+<!-- 1 -->
+<h2 id="big-picture"><span class="n">CHAPTER 01</span>The project in one page</h2>
+<p><strong>Title:</strong> Weather-Aware Multi-Site Short-Term Solar Power Forecasting Across India's MNRE-Sanctioned Solar Parks.</p>
+<p><strong>In one sentence:</strong> we built a system that predicts how much electricity 43 of India's big government-backed solar parks will produce 1, 3, 6 and 24 hours ahead, tested it honestly on nine months of data it had never seen, checked it on two real plants, and put it on a public website.</p>
+<div class="stats">
+  <div class="stat"><b>43</b><span>solar parks forecast, at 36 weather locations</span></div>
+  <div class="stat"><b>968,016</b><span>park-hours of data, Apr 2024 – Sep 2026</span></div>
+  <div class="stat"><b>4.5%</b><span>typical error 1 h ahead (% of park capacity)</span></div>
+  <div class="stat"><b>15–44%</b><span>better than the best simple baseline</span></div>
+  <div class="stat"><b>1.4%</b><span>error for all parks added together (1 h)</span></div>
+  <div class="stat"><b>11</b><span>experiments run</span></div>
+</div>
+<h3>The story in seven steps</h3>
+<ol class="steps">
+  <li><strong>Problem.</strong> Solar output jumps around with clouds, dust, heat and monsoon. The grid operator must know in advance how much is coming, and Indian rules charge plants for wrong schedules.</li>
+  <li><strong>Scope.</strong> We started with one plant, then widened it to all MNRE-sanctioned solar parks, because single-plant results don't generalise and grid operators care about totals. We verified the list from official records (the famous "42 parks" figure is from March 2019; the latest park-wise list has 50).</li>
+  <li><strong>Data problem.</strong> No park publishes hourly power. So we <em>calculate</em> it from real past weather using a physics library (pvlib). This is our "actual" power.</li>
+  <li><strong>Honesty rule.</strong> The model never sees the real weather. It only sees weather <em>forecasts</em> made 1–2 days earlier, exactly what a grid operator would have.</li>
+  <li><strong>Models.</strong> Simple baselines, then machine learning (Ridge, Random Forest, LightGBM, XGBoost, CatBoost) and deep learning (LSTM, GRU), the heavy ones on a laptop GPU.</li>
+  <li><strong>Experiments.</strong> Eleven experiments answered: which model is best, whether one model for all parks beats separate ones, which inputs matter, whether India's total is easier, how ramps behave, whether new parks can be forecast, whether our ranges are trustworthy, and whether it works on real plants.</li>
+  <li><strong>Delivery.</strong> A FastAPI service, a Streamlit dashboard and a public website show every forecast.</li>
+</ol>
+<div class="say"><span class="t">How to say it</span><p>"Our system forecasts India's solar parks 1 to 24 hours ahead. Because parks don't share data, we simulate their output with physics, but the model only sees day-old weather forecasts, so it can't cheat. One machine-learning model for all parks beats the best baseline by 15 to 44 percent, works for new parks, and transfers to real plants."</p></div>
+
+<!-- 2 -->
+<h2 id="words"><span class="n">CHAPTER 02</span>Words you must know</h2>
+<p>Learn these first. Almost every question uses one of them.</p>
+<dl class="gl">
+  <dt>MNRE</dt><dd>Ministry of New and Renewable Energy, Government of India. Runs the solar park scheme.</dd>
+  <dt>Solar park</dt><dd>A big area where the government prepares land, roads, substation and power lines; many companies then build <em>solar power plants</em> inside it. A park is not a plant. (Example: Bhadla in Rajasthan.)</dd>
+  <dt>SPPD</dt><dd>Solar Power Park Developer: the agency that develops the park (often a state company or a joint venture with SECI).</dd>
+  <dt>SECI</dt><dd>Solar Energy Corporation of India, a central company that helps implement the scheme.</dd>
+  <dt>Capacity (MW)</dt><dd>The maximum power the park can deliver. Sanctioned = approved; commissioned = actually built and running.</dd>
+  <dt>Irradiance</dt><dd>Sunlight power per square metre (W/m²). GHI = total on flat ground; DNI = direct beam; DHI = scattered (diffuse) light from the sky.</dd>
+  <dt>Clear-sky power</dt><dd>What the park would produce right now if there were no clouds. Calculated from sun position.</dd>
+  <dt>Clear-sky index (k)</dt><dd>Actual power ÷ clear-sky power. k = 1 means clear sky, k = 0.3 means heavy cloud.</dd>
+  <dt>Capacity factor</dt><dd>Average output ÷ capacity over a year. Our parks: 19.8–24.3%.</dd>
+  <dt>NWP</dt><dd>Numerical Weather Prediction: a weather forecast made by a physics computer model. We use ECMWF IFS.</dd>
+  <dt>ECMWF</dt><dd>European Centre for Medium-Range Weather Forecasts. Makes the IFS forecast (0.25° ≈ 25 km grid) and ERA5.</dd>
+  <dt>ERA5</dt><dd>A "reanalysis": the best reconstruction of what the weather actually was, every hour, worldwide. We use it as "real past weather".</dd>
+  <dt>Open-Meteo</dt><dd>A free website/API that serves ERA5 and archived ECMWF forecasts. We downloaded everything through it.</dd>
+  <dt>pvlib</dt><dd>An open-source Python library that calculates solar panel power from weather using physics.</dd>
+  <dt>Horizon</dt><dd>How far ahead we predict: 1, 3, 6 or 24 hours (24 h = "day-ahead").</dd>
+  <dt>Baseline</dt><dd>A simple forecast that any model must beat. Ours: persistence, smart persistence, climatology, NWP + physics.</dd>
+  <dt>Persistence</dt><dd>"Next hour = this hour." Very bad at sunrise/sunset.</dd>
+  <dt>Smart persistence</dt><dd>"The sky stays as cloudy as it is now": take today's clear-sky index and apply it to the future clear-sky power. Our main baseline.</dd>
+  <dt>nRMSE</dt><dd>Our main error score: root-mean-square error divided by capacity, in percent. Lower is better. 4.5% on a 2,000 MW park ≈ 90 MW typical error.</dd>
+  <dt>Skill</dt><dd>How much better than smart persistence: 1 − (our error ÷ baseline error). 34% skill = 34% less error.</dd>
+  <dt>Global model</dt><dd>One model trained on all parks together (the opposite of one model per park).</dd>
+  <dt>Feature</dt><dd>One input column the model uses, e.g. "power 1 hour ago" or "forecast cloud cover".</dd>
+  <dt>GPU / CUDA</dt><dd>Graphics card and NVIDIA's software for running maths on it. We trained XGBoost, CatBoost, LSTM, GRU on an RTX 4060.</dd>
+  <dt>Prediction interval</dt><dd>A range, e.g. "1,080 MW, likely between 832 and 1,312 MW". An 80% interval should contain the truth 80% of the time.</dd>
+  <dt>Conformal (CQR)</dt><dd>Conformalised Quantile Regression: a method that corrects the width of the ranges using a calibration period so that coverage is really 80%.</dd>
+  <dt>Ramp</dt><dd>A sudden big change in output (a cloud bank arriving or leaving).</dd>
+  <dt>SHAP</dt><dd>A method that shows how much each input contributed to each prediction.</dd>
+  <dt>Köppen–Geiger</dt><dd>A standard world climate map (e.g. BWh = hot desert, BSh = hot semi-arid).</dd>
+  <dt>UTC / IST</dt><dd>We store all times in UTC; India time IST = UTC + 5:30, used only for display.</dd>
+</dl>
+
+<!-- 3 -->
+<h2 id="solar-basics"><span class="n">CHAPTER 03</span>Solar power basics</h2>
+<h3>Why solar output changes</h3>
+<ul>
+  <li><strong>Sun position:</strong> zero at night, peak near noon, lower in winter. This part is perfectly predictable.</li>
+  <li><strong>Clouds:</strong> the biggest uncertainty. A passing cloud can cut output by half in minutes.</li>
+  <li><strong>Dust and haze (aerosols):</strong> reduce sunlight, especially in Rajasthan and Gujarat.</li>
+  <li><strong>Temperature:</strong> panels lose about 0.37% of power for every °C hotter. Hot Indian summers cost real output.</li>
+  <li><strong>Monsoon:</strong> June–September clouds and rain drop output by 5–12 percentage points of capacity factor.</li>
+</ul>
+<h3>How sunlight becomes electricity (the physics chain)</h3>
+<pre class="mermaid">
+flowchart LR
+  A[Weather: GHI, DNI, DHI,<br/>temperature, wind] --> B[Sun position<br/>every hour]
+  B --> C[Light on tilted panel<br/>Perez model]
+  C --> D[Reflection loss<br/>ASHRAE IAM]
+  D --> E[Cell temperature<br/>SAPM / Faiman]
+  E --> F[DC power<br/>PVWatts, -0.37%/°C]
+  F --> G[Losses ~14%<br/>dust, wiring, mismatch]
+  G --> H[Inverter DC→AC<br/>96%, clipped at AC limit]
+  H --> I[Power as fraction<br/>of capacity]
+</pre>
+<p>In plain words: find where the sun is, work out how much light lands on the tilted panels, remove light reflected away at steep angles, work out how hot the cells get, convert to DC power (less when hot), subtract everyday losses, then pass through the inverter, which cannot exceed the plant's AC rating ("clipping").</p>
+<h3>Forecasting approaches</h3>
+<ul>
+  <li><strong>Physical:</strong> weather forecast → physics → power. Good for hours to days, but inherits forecast errors.</li>
+  <li><strong>Statistical / machine learning:</strong> learn patterns from history. Strong for the next few hours.</li>
+  <li><strong>Hybrid (ours):</strong> feed the ML model both recent output and the weather forecast passed through physics. The ML learns to correct the physics.</li>
+</ul>
+
+<!-- 4 -->
+<h2 id="parks"><span class="n">CHAPTER 04</span>The MNRE solar parks</h2>
+<p>The MNRE "Scheme for Development of Solar Parks and Ultra Mega Solar Power Projects" started in December 2014 with a 20,000 MW target, raised to 40,000 MW in 2017. The government gives financial help (CFA) and the park developer prepares land and transmission.</p>
+<h3>Verifying "42 parks"</h3>
+<p>The brief said "42 MNRE solar parks". We checked the official records instead of assuming it:</p>
+<div class="tbl"><table>
+<thead><tr><th>Date</th><th class="num">Parks</th><th class="num">Capacity (MW)</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>31 March 2019</td><td class="num">42</td><td class="num">23,499</td><td>SECI Annual Report 2018–19</td></tr>
+<tr><td>10 August 2023</td><td class="num">50</td><td class="num">37,990</td><td>Lok Sabha Unstarred Question 3633 (park-wise list, 12 States)</td></tr>
+<tr><td>February 2026</td><td class="num">54</td><td class="num">39,188</td><td>Latest official status (PIB)</td></tr>
+</tbody></table></div>
+<p>The 42-park figure is correct but only for March 2019, and its park-by-park list is not published. The latest official park-wise list (50 parks) is our study universe. We built a <strong>master table</strong> with every park: name, State, developer, sanctioned and commissioned MW, status, approximate coordinates (OpenStreetMap), and source.</p>
+<h3>From 50 parks to 43 modelled parks</h3>
+<div class="tbl"><table>
+<thead><tr><th>Group</th><th class="num">Parks</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Core (U2)</td><td class="num">18</td><td>Already producing power (10,237 MW commissioned in 2023). Forecast in MW at commissioned capacity.</td></tr>
+<tr><td>Virtual (U3)</td><td class="num">25</td><td>Under construction but with a known location. Simulated at sanctioned capacity, clearly labelled "virtual".</td></tr>
+<tr><td>Excluded</td><td class="num">7</td><td>2 dropped/revised by 2026 (P15, P18); 5 with no verified location (P20, P32, P33, P34, P43).</td></tr>
+</tbody></table></div>
+<p>Some parks share exact coordinates (Bhadla II–IV, the five Khavda parks, Pugal I–II), so 43 parks sit at <strong>36 weather locations</strong>. Total modelled capacity: about 32,076 MW. Three are floating parks (Omkareshwar, Getalsud, DVC) and are simulated with a low 10° tilt and better water cooling.</p>
+<div class="why"><span class="t">Why "solar park" and not "solar power plant"</span><p>A park is the shared infrastructure zone; plants are the individual projects inside it built by different companies. MNRE sanctions parks. Using the right word shows you understand the scheme.</p></div>
+
+<!-- 5 -->
+<h2 id="gap"><span class="n">CHAPTER 05</span>Research gap and questions</h2>
+<p>What earlier work was missing:</p>
+<ul>
+  <li><strong>One plant at a time.</strong> Most Indian studies forecast a single plant, so we don't know if methods work across deserts, coasts and hills.</li>
+  <li><strong>Real power data is hidden.</strong> Parks don't publish hourly output, so most methods can't even be tried.</li>
+  <li><strong>New parks are not tested.</strong> Models are rarely tested on a park they never saw, though new parks open every year.</li>
+  <li><strong>No India-wide picture.</strong> Few studies measure whether adding parks together (State, region, India) makes forecasting easier.</li>
+  <li><strong>Over-stated accuracy.</strong> Many studies feed the model the <em>actual</em> weather instead of a forecast. Nobody has tomorrow's actual weather.</li>
+  <li><strong>No trusted ranges.</strong> Most forecasts give one number without a calibrated range.</li>
+</ul>
+<h3>Research questions (and where each is answered)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Question</th><th>Experiment</th><th>Short answer</th></tr></thead>
+<tbody>
+<tr><td>Which model type works best?</td><td>E1, E10</td><td>All learned models are close; all beat baselines by a lot.</td></tr>
+<tr><td>One model for all parks or one per park?</td><td>E2</td><td>One global model wins at 43/43 parks.</td></tr>
+<tr><td>Do regional or climate models help?</td><td>E3, E3b</td><td>No, the global model still wins.</td></tr>
+<tr><td>Which inputs matter?</td><td>E4</td><td>Weather forecast + recent power; metadata barely.</td></tr>
+<tr><td>Is India's total easier?</td><td>E5</td><td>Yes, error falls by two-thirds.</td></tr>
+<tr><td>What about cloudy days and ramps?</td><td>E6</td><td>Harder; ramps are not predictable hourly.</td></tr>
+<tr><td>Can we forecast a new park?</td><td>E7</td><td>Yes, only +0.37 points extra error.</td></tr>
+<tr><td>Are the ranges trustworthy?</td><td>E8</td><td>After CQR, 80–82% coverage for an 80% target.</td></tr>
+<tr><td>How much is the weather forecast to blame?</td><td>E9</td><td>Almost all of the remaining error.</td></tr>
+<tr><td>Does it work on real plants?</td><td>E11</td><td>Yes, beats smart persistence without retraining.</td></tr>
+</tbody></table></div>
+
+<!-- 6 -->
+<h2 id="data"><span class="n">CHAPTER 06</span>Data sources</h2>
+<div class="tbl"><table>
+<thead><tr><th>What</th><th>Source</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>Park list, capacity, status</td><td>Lok Sabha Q.3633 (2023), PIB press releases, SECI reports, Rajya Sabha answers</td><td>Master table, which parks to model, MW conversion</td></tr>
+<tr><td>Past weather ("what really happened")</td><td>ERA5 reanalysis via Open-Meteo archive API</td><td>Calculating the "actual" power (targets)</td></tr>
+<tr><td>Weather forecasts</td><td>ECMWF IFS 0.25° archived forecasts via Open-Meteo Previous Runs API (<code>previous_day1</code>, <code>previous_day2</code>)</td><td>Model inputs</td></tr>
+<tr><td>Locations</td><td>OpenStreetMap</td><td>Approximate coordinates of each park</td></tr>
+<tr><td>Climate class</td><td>Köppen–Geiger map via the <code>kgcpy</code> package</td><td>Climate grouping (E3b)</td></tr>
+<tr><td>Real measured power</td><td>Kaggle "Solar Power Generation Data": 2 Indian plants, 15 May – 17 Jun 2020, 15-minute data</td><td>Reality check (E11)</td></tr>
+<tr><td>State boundaries</td><td>datameet (Survey-of-India based)</td><td>Website map</td></tr>
+</tbody></table></div>
+<p><strong>Weather variables (9 each):</strong> GHI, DNI, DHI, temperature, relative humidity, cloud cover, wind speed, surface pressure, precipitation, hourly.</p>
+<p><strong>Download size:</strong> 36 locations × 2 datasets × 3 yearly chunks = 216 requests (≈6,689 weighted API calls), about two hours, 100% complete. The downloader is resumable (saved chunks are skipped) and rate-limited to stay inside Open-Meteo's free limits.</p>
+<h3>Why April 2024 to September 2026?</h3>
+<p>Our scope document first said 2022–2025. But honest archived ECMWF forecasts (with a known issue time) start only in mid-March 2024 for India. An older archive goes back to 2022, but it stitches together the newest forecast for each hour, so it can contain information issued <em>after</em> the forecast time (a hidden cheat). We chose honesty over length: <strong>1 April 2024 – 24 September 2026</strong> (21,768 hours per location).</p>
+
+<!-- 7 -->
+<h2 id="target"><span class="n">CHAPTER 07</span>Making the "actual" power</h2>
+<p>Because no park publishes hourly generation, we simulate it: ERA5 real weather → pvlib physics chain (chapter 3) → hourly power for every park. This is called the <strong>target</strong> (what the model tries to predict).</p>
+<h3>Assumptions (same for every park unless stated)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Panel tilt</td><td>Equal to latitude, facing south (floating: 10°)</td><td>Standard fixed-tilt design in India</td></tr>
+<tr><td>DC/AC ratio</td><td>1.25</td><td>Typical Indian utility plant</td></tr>
+<tr><td>Temperature coefficient</td><td>−0.37 %/°C</td><td>Crystalline silicon panels</td></tr>
+<tr><td>Cell temperature model</td><td>SAPM (ground); Faiman with stronger cooling (floating)</td><td>Water cools floating panels</td></tr>
+<tr><td>System losses</td><td>≈14% (PVWatts defaults)</td><td>Dust, shading, wiring, mismatch, availability</td></tr>
+<tr><td>Desert parks (Rajasthan, Gujarat)</td><td>Soiling 4%, albedo 0.25</td><td>More dust; brighter sand reflects more</td></tr>
+<tr><td>Inverter</td><td>96% efficient, clipped at AC capacity</td><td>Output can never exceed rating</td></tr>
+</tbody></table></div>
+<p>The power is stored as a <strong>fraction of capacity</strong> (0 to 1). This lets big and small parks share one model; MW = fraction × capacity.</p>
+<h3>Quality checks (all passed)</h3>
+<ul>
+  <li>No missing values; zero output at night; never above capacity.</li>
+  <li>No GHI above physical limits; diffuse never above total.</li>
+  <li>Annual capacity factor 19.8% (Kasaragod, Kerala) to 24.3% (Bhadla, Rajasthan); core-park median 21.6%. Desert parks highest.</li>
+  <li>Monsoon drop: ~6 points in Rajasthan (27% → 21%), 11–12 points in central India and Maharashtra.</li>
+</ul>
+<h3>How good is the weather forecast itself?</h3>
+<p>Day-1 ECMWF GHI vs ERA5: correlation 0.90–0.97, error (RMSE) 70–124 W/m². The forecast <strong>under-estimates</strong> sunlight in Rajasthan (−30 to −37 W/m²) and <strong>over-estimates</strong> it in the south and centre (+20 to +42; Mizoram +51), probably because of different dust/aerosol handling. A location-dependent bias like this is exactly what machine learning can learn to correct.</p>
+<div class="warn"><span class="t">Be upfront about this</span><p>Our "actual" values are simulated, so results describe how predictable the weather-driven output is, not real plant operations (outages, curtailment). That is why we did the real-plant check in E11.</p></div>
+
+<!-- 8 -->
+<h2 id="no-cheat"><span class="n">CHAPTER 08</span>The no-cheating rules</h2>
+<p>These are the most important design decisions. Examiners like them because they show the results are honest.</p>
+<h3>Rule 1: Different weather for answers and inputs</h3>
+<p>The answer (target) is made from ERA5, the real weather. The model's inputs are ECMWF <em>forecasts</em>. If both came from the same weather, the model could simply learn the physics formula and look perfect.</p>
+<h3>Rule 2: The lead-time rule</h3>
+<p>A forecast from the <code>previous_dayN</code> series was issued about N×24 hours before its valid time. Forecasts also arrive ~6 hours after they are issued. So for a forecast made at time t for h hours ahead:</p>
+<div class="formula">usable only if 24 × N − h ≥ 6 hours</div>
+<ul>
+  <li>1, 3, 6 h ahead → <code>previous_day1</code> (24 − 6 = 18 ≥ 6 ✓)</li>
+  <li>24 h ahead → <code>previous_day1</code> fails (24 − 24 = 0), so we use <code>previous_day2</code> (48 − 24 = 24 ≥ 6 ✓)</li>
+</ul>
+<p>This is conservative: our model never uses a forecast fresher than what an operator would really have.</p>
+<h3>Rule 3: Recent power only up to the forecast time</h3>
+<p>For a forecast at time t for t + h, every past-power input is shifted so it ends at t. The only inputs at the future time are things known in advance: sun position, clear-sky power, and the day-old weather forecast.</p>
+<h3>Rule 4: Time is never shuffled</h3>
+<p>Train on the past, test on the future. Random shuffling would let the model peek at neighbouring hours from the test period.</p>
+<h3>Time convention</h3>
+<p>All timestamps are UTC and mark the <em>end</em> of the hour. Sun position is computed at the middle of the hour (t − 30 min). The website shows IST, so labels end in ":30" (e.g. 12:30 IST = 07:00 UTC).</p>
+
+<!-- 9 -->
+<h2 id="pipeline"><span class="n">CHAPTER 09</span>The pipeline, script by script</h2>
+<pre class="mermaid">
+flowchart TD
+  M[Master table CSV] --> S1[01 registry]
+  S1 --> S2[02 fetch weather]
+  S2 --> S3[03 simulate targets]
+  S3 --> S4[04 QC report]
+  S3 --> S5[05 build features<br/>per horizon]
+  S5 --> S6[06 ML models + baselines]
+  S5 --> S8[08 LSTM / GRU on GPU]
+  S6 --> S7[07 experiments E2–E9]
+  S6 --> S10[10 CatBoost + tuning]
+  S6 --> S11[11 real-plant check]
+  S6 --> S13[13 climate groups]
+  S7 --> S9[09 results summary]
+  S8 --> S9
+  S6 --> S12[12 export website data]
+  S7 --> S12
+  S12 --> S14[14 build public site]
+  S6 --> API[FastAPI + Streamlit]
+</pre>
+<div class="tbl"><table>
+<thead><tr><th>Script</th><th>What it does</th><th>Main output</th></tr></thead>
+<tbody>
+<tr><td><code>01_build_registry</code></td><td>Reads the master table, assigns tiers (core/virtual/excluded), groups parks into weather locations</td><td><code>park_registry.csv</code>, <code>locations.csv</code></td></tr>
+<tr><td><code>02_fetch_weather</code></td><td>Downloads ERA5 and ECMWF forecasts for 36 locations, resumable and rate-limited</td><td>Parquet files per location/year</td></tr>
+<tr><td><code>03_simulate_targets</code></td><td>pvlib chain on ERA5 → hourly power fraction + clear-sky power for each park</td><td><code>targets_simulated.parquet</code></td></tr>
+<tr><td><code>04_qc_report</code></td><td>Completeness, physical limits, capacity factors, forecast-vs-reanalysis comparison, figures</td><td><code>reports/qc/QC_REPORT.md</code></td></tr>
+<tr><td><code>05_build_features</code></td><td>Builds the model table for each horizon (one row per park and hour)</td><td><code>model_h1/h3/h6/h24.parquet</code></td></tr>
+<tr><td><code>06_train_models</code></td><td>E1: baselines, Ridge, Random Forest, XGBoost (GPU), LightGBM</td><td>Predictions + <code>e1_models.csv</code></td></tr>
+<tr><td><code>07_experiments</code></td><td>E2–E9: per-park, regional, ablation + SHAP, aggregation, ramps, unseen locations, intervals, oracle</td><td><code>e2…e9*.csv</code>, <code>intervals_h*.parquet</code></td></tr>
+<tr><td><code>08_train_deep</code></td><td>LSTM and GRU on the GPU</td><td><code>e1b_deep_learning.csv</code></td></tr>
+<tr><td><code>09_results_summary</code></td><td>Collects all results and figures</td><td><code>reports/results/RESULTS.md</code></td></tr>
+<tr><td><code>10_catboost_tuning</code></td><td>E10: CatBoost on GPU, LightGBM tuning grid</td><td><code>e10_catboost_tuning.csv</code></td></tr>
+<tr><td><code>11_real_data_check</code></td><td>E11: physics and forecasting on the two Kaggle plants</td><td><code>e11_*.csv</code></td></tr>
+<tr><td><code>12_export_site</code></td><td>Packs forecasts, intervals, metrics and map into compact JSON for the website</td><td><code>site/data/*.json</code></td></tr>
+<tr><td><code>13_climate_groups</code></td><td>E3b: Köppen classes + weather clusters, one model per group</td><td><code>e3b_climate_groups.csv</code></td></tr>
+<tr><td><code>14_build_public_site</code></td><td>Makes a standalone copy of the website for GitHub Pages</td><td><code>site_public/</code></td></tr>
+</tbody></table></div>
+<p>Shared code lives in the package <code>src/solarpark/</code>: <code>config</code> (paths, dates, settings), <code>registry</code>, <code>openmeteo</code> (downloader), <code>pvsim</code> (physics), <code>features</code>, <code>evaluate</code> (metrics), <code>forecasts</code> (used by the API and dashboard).</p>
+
+<!-- 10 -->
+<h2 id="features"><span class="n">CHAPTER 10</span>Model inputs (features)</h2>
+<p>Each row = one park, one future hour. About 1.6 million rows per horizon. Only daylight hours (sun elevation above 5°) are used for training and scoring.</p>
+<div class="tbl"><table>
+<thead><tr><th>Group</th><th>Inputs</th><th>Known when?</th></tr></thead>
+<tbody>
+<tr><td><strong>Recent power</strong> (13)</td><td>Power at t, t−1, t−2, t−3, t−6; same hour yesterday; 3/6/24-hour averages; 3/6-hour spread; current clear-sky index and its change</td><td>Up to forecast time t</td></tr>
+<tr><td><strong>Sun and time</strong> (8)</td><td>Clear-sky power, sun elevation, zenith, azimuth at the target hour; hour and day-of-year as sine/cosine</td><td>Always known (astronomy)</td></tr>
+<tr><td><strong>Weather forecast</strong> (10)</td><td>ECMWF forecast GHI, DNI, DHI, temperature, humidity, cloud cover, wind, pressure, rain at the target hour + <strong>physics power from the forecast</strong></td><td>Issued 1–2 days earlier</td></tr>
+<tr><td><strong>Park metadata</strong> (6)</td><td>Latitude, longitude, log capacity, floating or not, grid region, park ID</td><td>Fixed</td></tr>
+</tbody></table></div>
+<div class="eg"><span class="t">Why sine and cosine for hour?</span><p>Hour 23 and hour 0 are neighbours, but as plain numbers they look far apart. Putting the hour on a circle (sine, cosine) tells the model that the day wraps around.</p></div>
+<div class="eg"><span class="t">Why "physics power from the forecast"?</span><p>It gives the model a ready-made first guess. The ML then only has to learn the correction (forecast bias, local effects), which is much easier than learning physics from scratch.</p></div>
+<p>A fifth group, <strong>oracle</strong> inputs (the ERA5 real weather at the target hour), is used only in experiment E9 to measure how much error is due to the weather forecast. It is never used in normal models.</p>
+
+<!-- 11 -->
+<h2 id="models"><span class="n">CHAPTER 11</span>The models</h2>
+<h3>Baselines (no learning)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Baseline</th><th>Rule</th><th>Weakness</th></tr></thead>
+<tbody>
+<tr><td>Persistence</td><td>Future = now</td><td>Ignores the sun moving: terrible at 3–6 h</td></tr>
+<tr><td>Smart persistence</td><td>Future = current clear-sky index × future clear-sky power</td><td>Can't see clouds coming</td></tr>
+<tr><td>Climatology</td><td>Average for that park, month and hour</td><td>Ignores today's weather</td></tr>
+<tr><td>ECMWF + physics</td><td>pvlib applied to the weather forecast</td><td>Inherits forecast bias and errors</td></tr>
+</tbody></table></div>
+<h3>Machine learning</h3>
+<dl class="gl">
+  <dt>Ridge regression</dt><dd>A straight-line (linear) model with a penalty that stops weights growing too large. Simple and fast; can't capture curved relationships.</dd>
+  <dt>Random Forest</dt><dd>150 decision trees, each trained on a random 30% of rows; the answer is their average. Robust, CPU only.</dd>
+  <dt>LightGBM (main)</dt><dd>Gradient boosting: trees are built one after another, each fixing the previous ones' mistakes. Settings: learning rate 0.05, 127 leaves, up to 3,000 trees with early stopping (stops when the calibration error stops improving for 100 rounds). Fast, handles the park ID as a category, supports quantile ranges.</dd>
+  <dt>XGBoost (GPU)</dt><dd>Another gradient boosting library, run on the GPU (<code>device="cuda"</code>, depth 8). Trains in 2–3 seconds per horizon.</dd>
+  <dt>CatBoost (GPU)</dt><dd>Gradient boosting that is good with categories; run on the GPU in E10.</dd>
+</dl>
+<h3>Deep learning (PyTorch, GPU)</h3>
+<p><strong>LSTM</strong> and <strong>GRU</strong> are recurrent neural networks: they read a sequence step by step and keep a memory. Our network:</p>
+<ul>
+  <li>Reads the <strong>last 24 hours</strong> of [power, clear-sky power, clear-sky index] with a 2-layer LSTM/GRU of 64 units.</li>
+  <li>Combines that memory with all the tabular inputs (forecast, sun, metadata) and an 8-number learned "park embedding" (a learned fingerprint of each park).</li>
+  <li>Passes through dense layers 128 → 64 → 1 with a sigmoid, so output stays between 0 and 1.</li>
+  <li>Adam optimiser, learning rate 0.001, early stopping on the calibration period. About 20–30 seconds per model on the RTX 4060.</li>
+</ul>
+<h3>Ensemble</h3>
+<p>The simple average of LightGBM and GRU. Different model types make slightly different mistakes, so averaging cancels some of them. It gave our best numbers.</p>
+<h3>Why one global model?</h3>
+<p>One model trained on all 43 parks sees far more cloudy days, monsoon onsets and forecast errors than any single park. It also works for a park with no history, because it learned general rules.</p>
+
+<!-- 12 -->
+<h2 id="testing"><span class="n">CHAPTER 12</span>How we tested</h2>
+<div class="tbl"><table>
+<thead><tr><th>Period</th><th>Dates</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td>Train</td><td>1 Apr 2024 – 30 Jun 2025</td><td>Models learn here</td></tr>
+<tr><td>Calibration</td><td>1 Jul – 31 Dec 2025</td><td>Early stopping, tuning, calibrating the ranges</td></tr>
+<tr><td>Test</td><td>1 Jan – 24 Sep 2026</td><td>Scored once; never seen in training</td></tr>
+</tbody></table></div>
+<p>Every period contains a monsoon, so the model is tested on hard weather.</p>
+<h3>Metrics</h3>
+<div class="formula">nRMSE = √( mean( (actual − forecast)² ) ) ÷ capacity × 100%</div>
+<div class="formula">Skill = 1 − nRMSE_model ÷ nRMSE_smart persistence</div>
+<p>We report nRMSE as a percent of capacity, over daylight hours only (night is trivially zero and would make everything look better). MAPE (percent error) is not used near sunrise and sunset because dividing by almost zero makes it meaningless.</p>
+<div class="eg"><span class="t">Example</span><p>Pavagada (2,000 MW). nRMSE 4.5% → typical error ≈ 90 MW. Smart persistence 5.3% → ≈ 106 MW. Skill = 1 − 4.5/5.3 ≈ 15%.</p></div>
+
+<!-- 13 -->
+<h2 id="results"><span class="n">CHAPTER 13</span>Results, experiment by experiment</h2>
+<p>All numbers: test period Jan–Sep 2026, daylight hours, all 43 parks, nRMSE in % of capacity (lower is better), unless stated.</p>
+
+<h3>E1 · Which model is best?</h3>
+<div class="tbl"><table>
+<thead><tr><th>Model</th><th class="num">1 h</th><th class="num">3 h</th><th class="num">6 h</th><th class="num">24 h</th></tr></thead>
+<tbody>
+<tr><td>Persistence</td><td class="num">14.80</td><td class="num">36.81</td><td class="num">52.51</td><td class="num">9.68</td></tr>
+<tr><td>Climatology</td><td class="num">9.82</td><td class="num">9.82</td><td class="num">9.82</td><td class="num">9.82</td></tr>
+<tr><td>Smart persistence (main baseline)</td><td class="num">5.28</td><td class="num">9.09</td><td class="num">11.61</td><td class="num">9.79</td></tr>
+<tr><td>ECMWF + physics</td><td class="num">8.61</td><td class="num">8.61</td><td class="num">8.61</td><td class="num">8.78</td></tr>
+<tr><td>Ridge</td><td class="num">4.95</td><td class="num">6.53</td><td class="num">6.88</td><td class="num">7.18</td></tr>
+<tr><td>Random Forest</td><td class="num">4.50</td><td class="num">5.99</td><td class="num">6.49</td><td class="num">7.00</td></tr>
+<tr><td>XGBoost (GPU)</td><td class="num">4.50</td><td class="num">5.99</td><td class="num">6.54</td><td class="num">7.09</td></tr>
+<tr><td>LightGBM</td><td class="num">4.53</td><td class="num">6.02</td><td class="num">6.59</td><td class="num">7.10</td></tr>
+<tr><td>LSTM (GPU)</td><td class="num">4.53</td><td class="num">6.05</td><td class="num">6.57</td><td class="num">7.09</td></tr>
+<tr><td>GRU (GPU)</td><td class="num">4.52</td><td class="num">6.07</td><td class="num">6.59</td><td class="num">7.06</td></tr>
+<tr class="best"><td>LightGBM + GRU average</td><td class="num">4.47</td><td class="num">5.98</td><td class="num">6.52</td><td class="num">7.02</td></tr>
+<tr><td><strong>Skill vs smart persistence</strong></td><td class="num">15%</td><td class="num">34%</td><td class="num">44%</td><td class="num">28%</td></tr>
+</tbody></table></div>
+<div class="bars" role="img" aria-label="6-hour-ahead error: smart persistence 11.61, ECMWF plus physics 8.61, ensemble 6.52">
+  <div class="bar g"><span>Smart persistence</span><i style="width:100%"></i><em>11.61</em></div>
+  <div class="bar"><span>ECMWF + physics</span><i style="width:74%"></i><em>8.61</em></div>
+  <div class="bar t"><span>Our best</span><i style="width:56%"></i><em>6.52</em></div>
+</div>
+<p class="cap">Error 6 hours ahead (% of capacity).</p>
+<p><strong>What it means:</strong></p>
+<ul>
+  <li>Every learned model beats every baseline at every horizon.</li>
+  <li>The advantage grows with horizon up to 6 h: recent power says less about the far future, while the weather forecast stays useful.</li>
+  <li>Why is plain persistence <em>better</em> at 24 h (9.68) than at 6 h? Because "same as 24 hours ago" = same hour yesterday, so the sun is in the same place. At 6 h, "same as now" compares morning with afternoon.</li>
+  <li>All learned models are within ~0.1 points. <strong>The inputs limit accuracy, not the algorithm.</strong></li>
+  <li>ML reduces the physics-only forecast error by about a quarter at day-ahead (8.78 → 7.02) by learning its bias.</li>
+</ul>
+<div class="say"><span class="t">How to say it</span><p>"All machine-learning models beat the baselines, by 15% at one hour up to 44% at six hours. The surprising part is that Random Forest, boosting and LSTM are almost equal, so better inputs, not fancier models, are the way forward."</p></div>
+
+<h3>E10 · Does tuning or CatBoost help?</h3>
+<p>CatBoost (GPU) and tuned LightGBM both reach 4.49 / 6.00 / 6.54 at 1 / 3 / 6 h, versus 4.53 / 6.02 / 6.59 for default LightGBM. Only 0.04–0.05 points. Defaults were already good.</p>
+
+<h3>E2 · One model per park or one global model?</h3>
+<div class="tbl"><table>
+<thead><tr><th>Design</th><th class="num">1 h</th><th class="num">3 h</th><th class="num">6 h</th></tr></thead>
+<tbody>
+<tr><td>43 separate per-park models</td><td class="num">4.67</td><td class="num">6.19</td><td class="num">6.72</td></tr>
+<tr class="best"><td>One global model</td><td class="num">4.43</td><td class="num">5.92</td><td class="num">6.48</td></tr>
+<tr><td>Parks where global wins</td><td class="num">43/43</td><td class="num">43/43</td><td class="num">42/43</td></tr>
+</tbody></table></div>
+<h3>E3 and E3b · Regional or climate models?</h3>
+<div class="tbl"><table>
+<thead><tr><th>Grouping</th><th class="num">Groups</th><th class="num">Group models (1 h)</th><th class="num">Global (1 h)</th><th>Global wins</th></tr></thead>
+<tbody>
+<tr><td>Grid regions (Northern, Western, Southern, Eastern, North-Eastern)</td><td class="num">5</td><td class="num">5.35</td><td class="num">5.21</td><td>at every horizon</td></tr>
+<tr><td>Köppen climate classes</td><td class="num">8</td><td class="num">4.53</td><td class="num">4.45</td><td>8 of 8 groups</td></tr>
+<tr><td>Weather clusters (k-means, k = 5)</td><td class="num">5</td><td class="num">4.51</td><td class="num">4.44</td><td>5 of 5 groups</td></tr>
+</tbody></table></div>
+<p class="cap">Global numbers differ slightly between rows because each comparison uses the parks and hours covered by that grouping.</p>
+<p>Köppen classes of our parks: 14 hot semi-arid (BSh), 13 hot desert (BWh), 7 "Mediterranean" (Csa, an artefact of the coarse map in central India), 3 tropical savanna (Aw), 2 Cwa, 2 As, 1 Am, 1 Cwb. Weather clusters were made with k-means on each location's monthly sunshine, cloud, temperature and rain (training period only); k = 5 had the best silhouette score (0.449).</p>
+<div class="say"><span class="t">How to say it</span><p>"One model that learns from every park beats separate models for each park, region or climate zone, because it sees far more weather situations."</p></div>
+
+<h3>E4 · Which inputs matter?</h3>
+<div class="tbl"><table>
+<thead><tr><th>Inputs used</th><th class="num">1 h</th><th class="num">3 h</th><th class="num">6 h</th></tr></thead>
+<tbody>
+<tr><td>All inputs</td><td class="num">4.53</td><td class="num">6.02</td><td class="num">6.59</td></tr>
+<tr><td>Without weather forecast</td><td class="num">4.66</td><td class="num">6.65</td><td class="num">7.80</td></tr>
+<tr><td>Without park metadata</td><td class="num">4.52</td><td class="num">6.02</td><td class="num">6.58</td></tr>
+<tr><td>Weather forecast + sun only (no recent power)</td><td class="num">7.02</td><td class="num">7.02</td><td class="num">7.02</td></tr>
+</tbody></table></div>
+<p><strong>SHAP share</strong> (how much each group drives predictions), 1 / 3 / 6 h: weather forecast 54 / 65 / 71%, recent power 36 / 24 / 19%, sun and time 8.6 / 8.3 / 7.4%, metadata 1.1 / 2.4 / 2.8%.</p>
+<p>Recent power matters most at 1 h; the forecast takes over as the horizon grows. Metadata adds nothing because recent power already tells the model which park it is.</p>
+
+<h3>E9 · How much error is the weather forecast's fault?</h3>
+<p>Give the model the <em>real</em> weather (ERA5) instead of the forecast: error drops to about 0.35–0.37%, more than ten times smaller. So almost all remaining error comes from the weather forecast, not the model. (This "oracle" model is only a diagnostic; it can't be used in practice.)</p>
+
+<h3>E5 · Is India's total easier to predict?</h3>
+<div class="tbl"><table>
+<thead><tr><th>Horizon</th><th class="num">Park</th><th class="num">State</th><th class="num">Region</th><th class="num">All parks</th></tr></thead>
+<tbody>
+<tr><td>1 h</td><td class="num">4.09</td><td class="num">3.01</td><td class="num">2.29</td><td class="num">1.37</td></tr>
+<tr><td>3 h</td><td class="num">5.61</td><td class="num">4.30</td><td class="num">3.29</td><td class="num">2.00</td></tr>
+<tr><td>6 h</td><td class="num">6.13</td><td class="num">4.75</td><td class="num">3.63</td><td class="num">2.23</td></tr>
+<tr><td>24 h</td><td class="num">6.64</td><td class="num">5.26</td><td class="num">4.04</td><td class="num">2.56</td></tr>
+</tbody></table></div>
+<p class="cap">Capacity-weighted, so the park column (4.09) differs from the simple average in E1 (4.53).</p>
+<p><strong>Why:</strong> forecast errors at far-apart parks are independent. Error correlation: 0.62 within 100 km, 0.17 at 100–300 km, 0.02 at 300–600 km, ~0 beyond. Independent errors partly cancel when added (like averaging many coin tosses). Formula: variance of the sum = Σσᵢ² + 2Σρᵢⱼσᵢσⱼ; small ρ means small total.</p>
+<div class="say"><span class="t">How to say it</span><p>"A cloud over Rajasthan has nothing to do with a cloud over Karnataka, so errors cancel. Forecasting India's total is three times easier than forecasting one park."</p></div>
+
+<h3>E6 · Cloudy days and ramps</h3>
+<div class="tbl"><table>
+<thead><tr><th>Condition (1 h ahead)</th><th class="num">nRMSE</th></tr></thead>
+<tbody>
+<tr><td>Clear days</td><td class="num">3.21</td></tr>
+<tr><td>Partly cloudy days</td><td class="num">7.91</td></tr>
+<tr><td>Overcast days</td><td class="num">6.71</td></tr>
+<tr><td>Monsoon / non-monsoon</td><td class="num">6.27 / 3.62</td></tr>
+<tr><td>Normal hours</td><td class="num">4.52</td></tr>
+<tr><td>Ramp hours (0.95% of hours): ours vs smart persistence</td><td class="num">21.8 vs 27.1</td></tr>
+</tbody></table></div>
+<p>A <strong>ramp</strong> = the clear-sky index jumps by more than 0.3 in one hour while there is meaningful sunlight, or a change above the park's 95th percentile. The model makes ramp errors smaller, but cannot predict <em>that</em> a ramp will happen: probability of detection 0.04, false-alarm ratio 0.89, critical success index 0.03. Reason: single clouds are much smaller than the 25 km forecast grid. Satellite nowcasting is needed for this.</p>
+<p>Partly cloudy days are harder than fully overcast ones because broken clouds change quickly; overcast is dull but steady.</p>
+
+<h3>E7 · Can we forecast a park we've never seen?</h3>
+<p>Leave-one-location-out: hide one weather location (and all parks there) from training, train on the rest, then forecast the hidden parks. Extra error: <strong>+0.37 points</strong> on average at 1 h (worst +4.2), +0.63 at 6 h (worst +11.3). Worst cases are parks with unusual climates. So new parks can get good forecasts from day one, as long as their climate is represented.</p>
+<p>Co-located parks (e.g. Bhadla II–IV) are hidden together, otherwise the model would have seen the same weather.</p>
+
+<h3>E8 · Can we trust the ranges?</h3>
+<div class="tbl"><table>
+<thead><tr><th>80% interval</th><th class="num">1 h</th><th class="num">3 h</th><th class="num">6 h</th><th class="num">24 h</th></tr></thead>
+<tbody>
+<tr><td>Raw quantile LightGBM: coverage</td><td class="num">69.7%</td><td class="num">71.8%</td><td class="num">73.3%</td><td class="num">73.8%</td></tr>
+<tr class="best"><td>After CQR: coverage</td><td class="num">80.3%</td><td class="num">81.2%</td><td class="num">82.0%</td><td class="num">82.1%</td></tr>
+<tr><td>CQR mean width (% of capacity)</td><td class="num">7.8</td><td class="num">10.9</td><td class="num">12.1</td><td class="num">13.2</td></tr>
+<tr><td>All-parks total: coverage</td><td class="num">83.8%</td><td class="num">83.8%</td><td class="num">83.7%</td><td class="num">83.9%</td></tr>
+<tr><td>All-parks total: ± half-width</td><td class="num">521 MW</td><td class="num">791 MW</td><td class="num">880 MW</td><td class="num">1,022 MW</td></tr>
+</tbody></table></div>
+<p><strong>How CQR works, simply:</strong> train models for the 10th and 90th percentiles. On the calibration period, see how often the truth falls outside, and by how much. Widen (or narrow) every interval by the amount that makes exactly 80% of calibration cases fall inside. The raw ranges were over-confident (70%); CQR fixes it. Monthly coverage stays 76–85%, a little low in the monsoon. Quantiles can't simply be added across parks, so the all-parks total gets its own split-conformal interval.</p>
+
+<h3>E11 · Does it work on real plants?</h3>
+<p>Public Kaggle data: two Indian plants, 34 days (15 May – 17 Jun 2020), measured output and on-site sensors. Locations aren't published, so we couldn't match ECMWF forecasts; capacity isn't published, so we used the 99.5th percentile of output as effective capacity.</p>
+<p><strong>Part A, physics check:</strong> pvlib on the plant's own sunlight sensor vs measured power: Plant 1 correlation <strong>0.992</strong>, error 3.4% after calibration. Plant 2: 0.821, 16.0%, because its data has outages and shutdowns no weather model can explain.</p>
+<p><strong>Part B, forecasting real output</strong> (nRMSE %):</p>
+<div class="tbl"><table>
+<thead><tr><th>Model</th><th class="num">Plant 1, 1 h</th><th class="num">Plant 1, 3 h</th><th class="num">Plant 2, 1 h</th><th class="num">Plant 2, 3 h</th></tr></thead>
+<tbody>
+<tr><td>Persistence</td><td class="num">17.26</td><td class="num">37.16</td><td class="num">17.44</td><td class="num">29.82</td></tr>
+<tr><td>Smart persistence</td><td class="num">11.15</td><td class="num">15.87</td><td class="num">13.44</td><td class="num">18.06</td></tr>
+<tr><td>Trained only on the plant's own data</td><td class="num">11.75</td><td class="num">14.03</td><td class="num">12.93</td><td class="num">14.09</td></tr>
+<tr class="best"><td>Our model, no retraining (zero-shot)</td><td class="num">10.25</td><td class="num">12.42</td><td class="num">12.57</td><td class="num">14.60</td></tr>
+<tr><td>Our model, fine-tuned on the plant</td><td class="num">10.15</td><td class="num">13.69</td><td class="num">11.84</td><td class="num">14.48</td></tr>
+</tbody></table></div>
+<p>Trained only on simulated parks, our model beats smart persistence at both plants and both horizons, and beats a plant-only model in 3 of 4 cases. Errors are higher than on simulated data, as expected with outages, dust and sensor noise.</p>
+<div class="say"><span class="t">How to say it</span><p>"Our biggest worry was that we only learned the simulator. So we tested on two real Indian plants: without any retraining, our model beat the baseline at both. What it learned transfers to reality."</p></div>
+
+<!-- 14 -->
+<h2 id="delivery"><span class="n">CHAPTER 14</span>API, dashboard and website</h2>
+<h3>Public website</h3>
+<p><a href="https://navneet-cerecode.github.io/mnre-solar-forecast/">navneet-cerecode.github.io/mnre-solar-forecast</a> (GitHub Pages). Tabs:</p>
+<ul>
+  <li><strong>India overview:</strong> map of India with State boundaries and all parks, coloured by status or error; summary numbers; pick horizon, day and hour.</li>
+  <li><strong>Park explorer:</strong> one park's details, actual vs forecast with the 80% range.</li>
+  <li><strong>State & India totals:</strong> summed forecasts with ranges.</li>
+  <li><strong>Results:</strong> the experiment charts.</li>
+  <li><strong>Method:</strong> a plain explanation.</li>
+</ul>
+<p>It is a static site (no server): HTML + Chart.js charts + an SVG map. Forecasts are packed as one byte per value (value × 250, base64) so the whole test period loads quickly, even on phones. The same page is also published as a private Claude artifact.</p>
+<h3>FastAPI service (<code>app/api.py</code>)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Endpoint</th><th>Returns</th></tr></thead>
+<tbody>
+<tr><td><code>/parks</code></td><td>All parks with location, capacity, tier</td></tr>
+<tr><td><code>/forecast/park/{id}?h=1</code></td><td>One park's forecast in MW with 80% range</td></tr>
+<tr><td><code>/forecast/total?level=state&h=6</code></td><td>State / region / all-park totals</td></tr>
+<tr><td><code>/metrics</code></td><td>Model accuracy by horizon</td></tr>
+</tbody></table></div>
+<p>Invalid horizons are rejected with a clear message. Interactive docs at <code>/docs</code>. Three automated tests cover it.</p>
+<h3>Streamlit dashboard (<code>app/dashboard.py</code>)</h3>
+<p>Map, park explorer, totals and results, for analysis on your own laptop. Map scroll-zoom is turned off so the page scrolls normally.</p>
+<div class="warn"><span class="t">Important</span><p>All three show saved test-period forecasts (Jan–Sep 2026). They are not yet connected to live weather. Running it live is future work.</p></div>
+
+<!-- 15 -->
+<h2 id="files"><span class="n">CHAPTER 15</span>Where everything lives</h2>
+<p>Project folder: <code>Desktop\Himanshu</code></p>
+<pre class="code">MNRE_Solar_Parks_Master_Table.csv   verified park list (input to everything)
+MNRE_42_Solar_Parks_Forecasting_Project_Scope.pdf   the scope document
+src/solarpark/        shared Python package (config, registry, downloader, physics, features, metrics)
+scripts/01…14_*.py    the pipeline (chapter 9)
+app/api.py            FastAPI service
+app/dashboard.py      Streamlit dashboard
+site/                 website (Artifact copy) + site/data/*.json
+site_public/          website for GitHub Pages (its own git repo)
+tests/                9 automated tests (registry, physics, API)
+docs/DECISIONS.md     every design decision, D1–D11
+data/raw/             downloaded weather, Kaggle data, boundaries
+data/interim/         registry, locations, park climate classes
+data/processed/       targets, model tables, predictions, intervals
+reports/qc/           quality-control report
+reports/results/      RESULTS.md, all experiment CSVs and figures
+report/               LaTeX report (main.tex), PDF, Overleaf zip
+Solar_Forecasting_Results_Presentation.pptx   final 15-slide deck</pre>
+
+<!-- 16 -->
+<h2 id="run"><span class="n">CHAPTER 16</span>How to run it</h2>
+<p>From the project folder, in order (each step can be rerun alone):</p>
+<pre class="code">pip install -r requirements.txt
+python scripts/01_build_registry.py
+python scripts/02_fetch_weather.py          # ~2 h first time; resumable
+python scripts/03_simulate_targets.py
+python scripts/04_qc_report.py
+python scripts/05_build_features.py h=1,3,6,24
+python scripts/06_train_models.py h=1,3,6,24
+python scripts/07_experiments.py            # or e.g. E5 E8 h=24
+python scripts/08_train_deep.py h=1,3,6,24  # needs CUDA PyTorch for speed
+python scripts/09_results_summary.py
+python -m pytest -q tests</pre>
+<p>To show it live:</p>
+<pre class="code">streamlit run app/dashboard.py      # http://localhost:8501
+uvicorn app.api:app                 # http://127.0.0.1:8000/docs
+python -m http.server 8601 --directory site_public</pre>
+<p><strong>Hardware used:</strong> Windows laptop with NVIDIA RTX 4060 (CUDA), PyTorch 2.13 (cu130). Training everything takes minutes, not hours.</p>
+
+<!-- 17 -->
+<h2 id="limits"><span class="n">CHAPTER 17</span>Limitations</h2>
+<ul>
+  <li><strong>Simulated targets.</strong> Most "actual" power is calculated from weather, so it has no outages, curtailment or maintenance.</li>
+  <li><strong>Assumed design.</strong> Tilt, DC/AC ratio, trackers and losses are not published per park; we used typical values.</li>
+  <li><strong>Capacity over time.</strong> Commissioning after Oct 2023 is not published per park, so core parks use 2023 commissioned capacity (a lower bound).</li>
+  <li><strong>Approximate coordinates;</strong> some parks are spread over several sites.</li>
+  <li><strong>Coarse weather grid (25 km)</strong> can't see individual clouds, so ramps are missed.</li>
+  <li><strong>Hourly, not 15-minute.</strong> Indian scheduling uses 15-minute blocks.</li>
+  <li><strong>ERA5 is itself a model</strong>, not a ground measurement.</li>
+  <li><strong>Real-data test is small:</strong> two plants, 34 days, without matching weather forecasts.</li>
+  <li><strong>Köppen map artefact:</strong> seven central-Indian parks fall in a "Mediterranean" class.</li>
+  <li><strong>Not live yet:</strong> website shows saved test-period forecasts.</li>
+</ul>
+
+<!-- 18 -->
+<h2 id="future"><span class="n">CHAPTER 18</span>Future scope</h2>
+<ul>
+  <li><strong>Satellite nowcasting</strong> (INSAT-3D/3DR, Meteosat) for 0–2 hours: the best fix for ramps and the main remaining error source (E6, E9).</li>
+  <li><strong>Run live:</strong> download each new ECMWF forecast automatically and update the website every hour.</li>
+  <li><strong>15-minute forecasts</strong> to match Indian scheduling and deviation settlement (CERC rules).</li>
+  <li><strong>Real data from park operators or load-despatch centres</strong> (SLDC/RLDC) to replace simulated targets.</li>
+  <li><strong>Adaptive conformal intervals</strong> that adjust in the monsoon (coverage dips to ~76%).</li>
+  <li><strong>Bigger models:</strong> Temporal Fusion Transformer, N-HiTS, graph neural networks across parks; blend several weather models.</li>
+  <li><strong>Hierarchical reconciliation</strong> so park, State and India forecasts add up consistently with their ranges.</li>
+  <li>Extend to hybrid wind–solar parks and all solar plants in a State.</li>
+</ul>
+
+<!-- 19 -->
+<h2 id="viva"><span class="n">CHAPTER 19</span>Viva questions and answers</h2>
+<details><summary>Why did you change from one plant to all MNRE parks?</summary><p>Single-plant results don't generalise across India's climates, grid operators care about State and regional totals, and data scarcity is the real Indian problem. Many parks let us study generalisation and aggregation, which one plant can't.</p></details>
+<details><summary>The brief said 42 parks. Why do you have 50, and why 43?</summary><p>42 parks (23,499 MW) is correct for 31 March 2019 (SECI annual report). The latest official park-wise list (Lok Sabha Q.3633, Aug 2023) has 50 parks, 37,990 MW. We model the 43 that have a verified location and are not dropped.</p></details>
+<details><summary>If the power is simulated, aren't you just predicting your own simulator?</summary><p>No, for two reasons. First, the target comes from the real weather (ERA5) while the model only sees day-old forecasts; it must predict the weather's effect, not copy a formula. Second, on two real plants the model, without retraining, beat smart persistence. We still label results as forecastability of weather-driven output.</p></details>
+<details><summary>Why is smart persistence the main baseline?</summary><p>It's the standard reference in solar forecasting. It already knows the sun's movement and only assumes cloudiness stays the same, so beating it proves the model adds real weather knowledge.</p></details>
+<details><summary>Why did deep learning not beat LightGBM?</summary><p>Because the limit is the information in the inputs, mainly the weather forecast (E9 shows perfect weather would cut error tenfold). Our inputs are already well-designed tabular features where boosted trees are very strong. LSTM and GRU matched LightGBM, and averaging them gave a small gain.</p></details>
+<details><summary>Why use the GPU?</summary><p>XGBoost, CatBoost and the neural networks train much faster on the RTX 4060 (XGBoost 2–3 s per horizon, each LSTM/GRU 20–30 s), which let us run many experiments. LightGBM and Random Forest ran on the CPU.</p></details>
+<details><summary>What is the lead-time rule?</summary><p>A forecast issued N days before its valid time can be used for horizon h only if 24N − h ≥ 6 hours, allowing ~6 hours for the forecast to become available. 1–6 h use day-1 forecasts; 24 h uses day-2 forecasts.</p></details>
+<details><summary>Why did you not use 2022–2023 data?</summary><p>Honest archived ECMWF forecasts with a known issue time start in March 2024 for India. An older archive exists but can contain information issued after the forecast time. We chose honesty over a longer period.</p></details>
+<details><summary>Why does a global model beat per-park models?</summary><p>It learns from 43 times more weather situations (cloud events, monsoon onsets, forecast errors). Rare events at one park are common across all parks. It also handles new parks.</p></details>
+<details><summary>Why is persistence better at 24 h than at 6 h?</summary><p>At 24 h, "same as now" means same hour yesterday, so the sun is in the same place. At 6 h it compares, say, 9 AM with 3 PM, which is completely different sun.</p></details>
+<details><summary>Why does aggregation reduce error?</summary><p>Errors at distant parks are nearly uncorrelated (0.02 beyond 300 km), so they partly cancel when summed. Total variance = sum of variances + 2 × sum of covariances; small covariance means a small total.</p></details>
+<details><summary>What is conformal prediction and why do you need it?</summary><p>The raw quantile model's 80% ranges only contained the truth 70% of the time. Conformal calibration uses a separate calibration period to measure that miss rate and widens the ranges until coverage is 80%. Result: 80–82%.</p></details>
+<details><summary>Why can't your model predict ramps?</summary><p>Ramps come from individual clouds, much smaller than the 25 km weather grid and faster than hourly data. The model reduces their size (21.8 vs 27.1) but can't foresee them. Satellite images are needed.</p></details>
+<details><summary>What is nRMSE and why percent of capacity?</summary><p>Root-mean-square error divided by installed capacity. It lets us compare parks of different sizes fairly, and is the standard in solar forecasting and in Indian deviation rules (which are capacity-based).</p></details>
+<details><summary>Why only daylight hours?</summary><p>At night output is zero and trivially predictable; including it would make errors look artificially small.</p></details>
+<details><summary>How did you ensure no data leakage?</summary><p>Different weather for targets and inputs; the lead-time rule; past power shifted to the forecast time; chronological split, test period scored once; co-located parks held out together in E7; ERA5 inputs used only in the diagnostic oracle experiment.</p></details>
+<details><summary>What did SHAP show?</summary><p>Weather forecast inputs contribute 54% (1 h) rising to 71% (6 h); recent power 36% falling to 19%; sun/time ~8%; metadata 1–3%.</p></details>
+<details><summary>What would you do with more time?</summary><p>Satellite nowcasting, live hourly operation, 15-minute forecasts, real operator data, adaptive intervals for the monsoon.</p></details>
+
+<!-- 20 -->
+<h2 id="cheat"><span class="n">CHAPTER 20</span>Numbers cheat sheet</h2>
+<div class="tbl"><table>
+<tbody>
+<tr><td>Parks: 2019 / 2023 list / Feb 2026</td><td class="num">42 / 50 / 54</td></tr>
+<tr><td>Capacity: 2019 / 2023 list / Feb 2026</td><td class="num">23,499 / 37,990 / 39,188 MW</td></tr>
+<tr><td>Commissioned in 2023</td><td class="num">10,237 MW (18 core parks)</td></tr>
+<tr><td>Modelled parks / weather locations</td><td class="num">43 / 36 (18 core + 25 virtual)</td></tr>
+<tr><td>Study window</td><td class="num">1 Apr 2024 – 24 Sep 2026</td></tr>
+<tr><td>Park-hours</td><td class="num">968,016</td></tr>
+<tr><td>Capacity factor range (2025)</td><td class="num">19.8–24.3%</td></tr>
+<tr><td>Monsoon drop</td><td class="num">5–12 points</td></tr>
+<tr><td>ECMWF vs ERA5 GHI correlation</td><td class="num">0.90–0.97</td></tr>
+<tr><td>Best error 1 / 3 / 6 / 24 h</td><td class="num">4.47 / 5.98 / 6.52 / 7.02%</td></tr>
+<tr><td>Smart persistence 1 / 3 / 6 / 24 h</td><td class="num">5.28 / 9.09 / 11.61 / 9.79%</td></tr>
+<tr><td>Skill 1 / 3 / 6 / 24 h</td><td class="num">15 / 34 / 44 / 28%</td></tr>
+<tr><td>Global vs per-park (1 h)</td><td class="num">4.43 vs 4.67, wins 43/43</td></tr>
+<tr><td>Unseen park extra error (1 h / 6 h)</td><td class="num">+0.37 / +0.63</td></tr>
+<tr><td>Park → all parks (1 h)</td><td class="num">4.09 → 1.37%</td></tr>
+<tr><td>Error correlation &lt;100 km / &gt;300 km</td><td class="num">0.62 / ~0.02</td></tr>
+<tr><td>CQR coverage (target 80%)</td><td class="num">80.3–82.1%</td></tr>
+<tr><td>All-parks 80% range, 1 h</td><td class="num">±521 MW</td></tr>
+<tr><td>Oracle error (perfect weather)</td><td class="num">~0.35%</td></tr>
+<tr><td>Real Plant 1 physics correlation</td><td class="num">0.992</td></tr>
+<tr><td>Real plants, zero-shot vs smart persistence (1 h)</td><td class="num">10.25 vs 11.15; 12.57 vs 13.44</td></tr>
+<tr><td>GPU</td><td class="num">NVIDIA RTX 4060</td></tr>
+</tbody></table></div>
+
+<footer>Guidebook for the B.Tech research project "Weather-Aware Multi-Site Short-Term Solar Power Forecasting Across India's MNRE-Sanctioned Solar Parks", Department of Electrical Engineering, NIT Patna. All figures are from the project's result files (test period January–September 2026).</footer>
+</main>
+</div>

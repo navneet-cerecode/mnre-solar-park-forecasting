@@ -1,0 +1,10 @@
+h,model,setting,calib_nRMSE_%,test_nRMSE_%,seconds
+1,CatBoost (GPU),"depth 8, 855 trees",5.217337024049862,4.48724865944939,13.401773691177368
+1,LightGBM tuned (12-setting grid on calib),"{'num_leaves': 255, 'learning_rate': 0.02, 'min_data_in_leaf': 200}",5.250367814508369,4.485701139297121,
+1,LightGBM default (E1),"num_leaves 127, lr 0.05, min_data 50",5.290024874991132,4.5260332760887065,
+3,CatBoost (GPU),"depth 8, 514 trees",7.024345214109755,5.99529360562154,24.026305198669434
+3,LightGBM tuned (12-setting grid on calib),"{'num_leaves': 127, 'learning_rate': 0.02, 'min_data_in_leaf': 200}",7.057495292718567,5.995403067274471,
+3,LightGBM default (E1),"num_leaves 127, lr 0.05, min_data 50",7.072556552323246,6.022249700838832,
+6,CatBoost (GPU),"depth 8, 330 trees",7.755903303610588,6.535948573142234,18.50954556465149
+6,LightGBM tuned (12-setting grid on calib),"{'num_leaves': 127, 'learning_rate': 0.02, 'min_data_in_leaf': 200}",7.758725225576842,6.543679797939513,
+6,LightGBM default (E1),"num_leaves 127, lr 0.05, min_data 50",7.801848486283179,6.588762781604103,

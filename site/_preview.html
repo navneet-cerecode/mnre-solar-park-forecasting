@@ -1,0 +1,602 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Solar Park Forecast Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* Layout: an operations console - header strip, tab bar, then map-left / inspector-right; stacks to one column on phones */
+:root {
+  --bg: #f3f5f7; --surface: #ffffff; --raised: #eef1f5; --ink: #15202b; --muted: #5a6573; --line: #dce2e8;
+  --sun: #d98c0b; --sun-soft: #fbefd6; --sky: #2563c9; --sky-soft: rgba(37, 99, 201, .16); --teal: #11806b;
+  --rose: #c0392f; --grey: #8b96a2; --hollow: #7aa0db;
+  --f-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1319; --surface: #151c24; --raised: #1b242e; --ink: #e5ebf1; --muted: #9aa6b3; --line: #27323d;
+  --sun: #f0ac2e; --sun-soft: #3a2c10; --sky: #6b9bf2; --sky-soft: rgba(107, 155, 242, .2); --teal: #33b597;
+  --rose: #e86a60; --grey: #7c8794; --hollow: #6b9bf2; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1319; --surface: #151c24; --raised: #1b242e; --ink: #e5ebf1; --muted: #9aa6b3; --line: #27323d;
+  --sun: #f0ac2e; --sun-soft: #3a2c10; --sky: #6b9bf2; --sky-soft: rgba(107, 155, 242, .2); --teal: #33b597;
+  --rose: #e86a60; --grey: #7c8794; --hollow: #6b9bf2; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: max(16px, 3vw); padding-block: 20px 56px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 88%; text-wrap: balance; margin: 0; letter-spacing: -.01em }
+h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 750; line-height: 1.08 }
+h2 { font-size: 1.35rem; font-weight: 700 }
+h3 { font-size: 1.02rem; font-weight: 650 }
+p { margin: 0 }
+.eyebrow { font: 500 .72rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--sun) }
+.muted { color: var(--muted) }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+small, .small { font-size: .82rem }
+
+header.top { display: grid; gap: 10px; padding-block: 8px 18px; border-bottom: 1px solid var(--line) }
+header.top .lede { max-width: 72ch; color: var(--muted) }
+.sunline { display: flex; align-items: center; gap: 10px }
+.sunline svg { flex: none }
+
+nav.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-block: 16px 20px; position: sticky; top: env(safe-area-inset-top, 0px);
+  background: var(--bg); padding-block: 8px; z-index: 5 }
+nav.tabs button { font: 600 .9rem var(--f-body); color: var(--muted); background: transparent; border: 1px solid transparent;
+  border-radius: 999px; padding: 7px 14px; cursor: pointer }
+nav.tabs button:hover { color: var(--ink); background: var(--raised) }
+nav.tabs button[aria-selected="true"] { color: var(--ink); background: var(--surface); border-color: var(--line) }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: end; margin-block: 0 14px }
+.field { display: grid; gap: 4px; min-width: 0 }
+.field > span { font: 500 .72rem var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+select, input[type=date] { font: 500 .92rem var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 7px 10px; max-width: 100% }
+input[type=range] { width: min(320px, 100%); accent-color: var(--sun) }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface) }
+.seg button { font: 600 .85rem var(--f-mono); color: var(--muted); background: transparent; border: 0; padding: 7px 12px; cursor: pointer }
+.seg button + button { border-left: 1px solid var(--line) }
+.seg button[aria-pressed="true"] { background: var(--sun-soft); color: var(--ink) }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-block: 0 18px }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 2px; min-width: 0 }
+.kpi .v { font: 600 1.6rem/1.15 var(--f-mono); font-variant-numeric: tabular-nums }
+.kpi .l { font-size: .8rem; color: var(--muted) }
+
+.console { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 16px; align-items: start }
+@media (max-width: 900px) { .console { grid-template-columns: 1fr } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; min-width: 0 }
+.mapbox { position: relative }
+.mapbox svg { width: 100%; height: auto; display: block }
+.state { fill: var(--raised); stroke: var(--line); stroke-width: .8 }
+.mk { cursor: pointer; transition: r .2s }
+.mk:focus { outline: none }
+.mk:focus-visible, .mk.sel { stroke: var(--ink) !important; stroke-width: 2.2 !important }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .8rem; color: var(--muted); margin-top: 8px }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px }
+
+.inspector { display: grid; gap: 12px }
+.pill { display: inline-block; font: 600 .72rem/1 var(--f-mono); letter-spacing: .04em; padding: 5px 8px; border-radius: 999px; border: 1px solid currentColor }
+.pill.ok { color: var(--teal) } .pill.part { color: var(--sun) } .pill.plan { color: var(--sky) } .pill.drop { color: var(--grey) }
+dl.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: .9rem }
+dl.kv dt { color: var(--muted) } dl.kv dd { margin: 0; font-family: var(--f-mono); font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere }
+.now { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.now div { background: var(--raised); border-radius: 8px; padding: 8px 10px; min-width: 0 }
+.now b { display: block; font: 600 1.15rem var(--f-mono) } .now span { font-size: .75rem; color: var(--muted) }
+.chart { position: relative; height: 320px } .chart.sm { height: 150px } .chart.md { height: 260px }
+
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px }
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; margin-block: 0 18px }
+.finding { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 6px; align-content: start }
+.finding .big { font: 600 1.45rem/1.1 var(--f-mono) }
+.finding.weak { background: color-mix(in srgb, var(--rose) 7%, var(--surface)) }
+.finding .tag { font: 500 .7rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+.finding.weak .tag { color: var(--rose) }
+.tbl { overflow-x: auto } table { border-collapse: collapse; width: 100%; font-size: .86rem }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap }
+td.n, th.n { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+section[hidden] { display: none }
+.stack { display: grid; gap: 16px }
+.prose { max-width: 70ch; display: grid; gap: 10px } .prose ul { margin: 0; padding-left: 1.2em }
+.note { font-size: .82rem; color: var(--muted) }
+.loading { color: var(--muted); font-family: var(--f-mono); font-size: .85rem }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="sunline">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="6.5" fill="var(--sun)"/><g stroke="var(--sun)" stroke-width="2" stroke-linecap="round"><path d="M15 2.5v3.2M15 24.3v3.2M2.5 15h3.2M24.3 15h3.2M6.2 6.2l2.2 2.2M21.6 21.6l2.2 2.2M6.2 23.8l2.2-2.2M21.6 8.4l2.2-2.2"/></g></svg>
+      <span class="eyebrow">B.Tech research project · MNRE Solar Park Scheme</span>
+    </div>
+    <h1>Solar Park Forecast Console</h1>
+    <p class="lede">Hourly forecasts of how much power India's MNRE-sanctioned solar parks will produce 1, 3 and 6 hours ahead, with calibrated 80% ranges. Test period January to September 2026, data the models never saw while training.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-overview" aria-controls="overview" aria-selected="true">India overview</button>
+    <button role="tab" id="tab-parks" aria-controls="parks" aria-selected="false">Park explorer</button>
+    <button role="tab" id="tab-totals" aria-controls="totals" aria-selected="false">State &amp; India totals</button>
+    <button role="tab" id="tab-results" aria-controls="results" aria-selected="false">Results</button>
+    <button role="tab" id="tab-method" aria-controls="method" aria-selected="false">Method</button>
+  </nav>
+
+  <!-- ===================================================== OVERVIEW -->
+  <section id="overview" role="tabpanel" aria-labelledby="tab-overview">
+    <div class="controls">
+      <div class="field"><span>Horizon</span><div class="seg" data-horizon></div></div>
+      <label class="field"><span>Day (IST)</span><input type="date" id="ov-day"></label>
+      <label class="field"><span>Hour (IST) <b id="ov-hour-lbl" class="num"></b></span><input type="range" id="ov-hour" min="6" max="19" step="1" value="13"></label>
+      <div class="field"><span>Colour parks by</span><div class="seg" id="ov-mode"><button aria-pressed="true" data-v="status">Status</button><button aria-pressed="false" data-v="error">Forecast error</button></div></div>
+    </div>
+    <div class="kpis" id="kpis"><p class="loading">Loading forecasts…</p></div>
+    <div class="console">
+      <div class="panel mapbox">
+        <svg id="map" viewBox="0 0 560 640" role="img" aria-label="Map of India with the MNRE solar parks"></svg>
+        <div class="legend" id="legend"></div>
+        <p class="note">Boundaries indicative (Survey-of-India-based, datameet). Park positions approximate (OpenStreetMap geocoding). Filled discs: parks with commissioned capacity; rings: parks under construction, forecast as if built. Disc brightness shows output at the chosen hour.</p>
+      </div>
+      <div class="panel inspector" id="inspector" aria-live="polite"></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3 id="ov-total-title">All parks combined</h3>
+      <p class="note" id="ov-total-note"></p>
+      <div class="chart"><canvas id="ov-total" aria-label="All-parks actual and forecast power for the chosen day"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== PARK EXPLORER -->
+  <section id="parks" role="tabpanel" aria-labelledby="tab-parks" hidden>
+    <div class="controls">
+      <label class="field" style="flex:1 1 280px"><span>Solar park</span><select id="pk-park"></select></label>
+      <div class="field"><span>Horizon</span><div class="seg" data-horizon></div></div>
+      <label class="field"><span>Week starting</span><input type="date" id="pk-week"></label>
+    </div>
+    <div class="kpis" id="pk-kpis"></div>
+    <div class="panel">
+      <h3 id="pk-title"></h3>
+      <p class="note">Black: actual output (simulated with pvlib from ERA5 weather). Blue: LightGBM forecast with its 80% range. Orange: GRU neural network. Grey: smart-persistence baseline.</p>
+      <div class="chart"><canvas id="pk-chart" aria-label="Actual and forecast power for the chosen park and week"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== TOTALS -->
+  <section id="totals" role="tabpanel" aria-labelledby="tab-totals" hidden>
+    <div class="controls">
+      <div class="field"><span>Level</span><div class="seg" id="tt-level"><button aria-pressed="true" data-v="all">All parks</button><button aria-pressed="false" data-v="region">Grid region</button><button aria-pressed="false" data-v="state">State</button></div></div>
+      <label class="field" id="tt-name-wrap" hidden><span id="tt-name-lbl">Region</span><select id="tt-name"></select></label>
+      <div class="field"><span>Horizon</span><div class="seg" data-horizon></div></div>
+      <label class="field"><span>Week starting</span><input type="date" id="tt-week"></label>
+    </div>
+    <div class="kpis" id="tt-kpis"></div>
+    <div class="panel"><h3 id="tt-title"></h3><p class="note" id="tt-note"></p><div class="chart"><canvas id="tt-chart"></canvas></div></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="panel"><h3>Adding parks together cuts the error</h3><p class="note">LightGBM error as % of capacity, all 43 parks, test period. Each level sums the forecasts below it.</p><div class="chart md"><canvas id="tt-agg"></canvas></div></div>
+      <div class="panel"><h3>Why: far-apart parks make unrelated errors</h3><p class="note">Correlation of 1-hour forecast errors between pairs of weather locations, by distance.</p><div class="chart md"><canvas id="tt-corr"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== RESULTS -->
+  <section id="results" role="tabpanel" aria-labelledby="tab-results" hidden>
+    <div class="findings" id="findings"></div>
+    <div class="stack">
+      <div class="panel"><h3>Model comparison</h3><p class="note">Error (nRMSE) as % of park capacity, all 43 parks, daylight hours, January to September 2026. Lower is better.</p><div class="chart"><canvas id="rs-models"></canvas></div></div>
+      <div class="grid2">
+        <div class="panel"><h3>Where forecasts struggle (1 h ahead)</h3><p class="note" id="rs-ramp-note"></p><div class="chart md"><canvas id="rs-cond"></canvas></div></div>
+        <div class="panel"><h3>Are the 80% ranges honest?</h3><p class="note">Share of hours where the actual value fell inside the calibrated 80% range, by month (1 h ahead).</p><div class="chart md"><canvas id="rs-cov"></canvas></div></div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h3>What the models rely on</h3><p class="note">Share of the LightGBM model's decisions by input group (SHAP).</p><div class="chart md"><canvas id="rs-shap"></canvas></div></div>
+        <div class="panel"><h3>Checked against real plants</h3><p class="note">Two Indian plants with measured output (Kaggle, May–June 2020). Hourly forecast error, last 10 days, % of capacity.</p><div class="tbl" id="rs-real"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== METHOD -->
+  <section id="method" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <div class="grid2">
+      <div class="panel prose">
+        <h2>How the forecasts are made</h2>
+        <ul>
+          <li><b>Parks:</b> 50 parks from the official park-wise list (Lok Sabha Q.3633, Aug 2023). 43 have a verified location and are forecast: 18 already generating, 25 under construction (forecast as if built at sanctioned capacity).</li>
+          <li><b>Actual output:</b> no park publishes hourly metered output, so it is calculated with pvlib from ERA5 reanalysis weather. On a real plant with its own sensor, this method matches measured output with 0.992 correlation.</li>
+          <li><b>Model inputs:</b> ECMWF weather forecasts issued a day earlier, recent output, sun position, time of day and park details. The model never sees the weather that actually happened.</li>
+          <li><b>Models:</b> LightGBM, XGBoost, CatBoost and Random Forest (tree ensembles), LSTM and GRU neural networks, trained on an NVIDIA RTX 4060 GPU where supported.</li>
+          <li><b>Ranges:</b> LightGBM quantile models calibrated with conformal prediction, so an 80% range contains the actual value about 80% of the time.</li>
+          <li><b>Testing:</b> train April 2024 to June 2025, calibrate July to December 2025, test January to September 2026. No shuffling: the model never learns from the future.</li>
+        </ul>
+      </div>
+      <div class="panel prose">
+        <h2>Read the numbers with these limits</h2>
+        <ul>
+          <li>Errors are relative to simulated output. Real plants also have outages, curtailment and dust events, which roughly doubled the error on the two real plants tested.</li>
+          <li>Sudden cloud swings (about 1% of hours) are mostly missed.</li>
+          <li>Errors roughly double in the monsoon (June to September).</li>
+          <li>Capacity for generating parks is the Oct-2023 commissioned figure; later additions are not published park by park.</li>
+          <li>This page shows saved test-period forecasts, not a live feed.</li>
+        </ul>
+        <p class="note">Sources: MNRE, PIB, SECI, Lok Sabha and Rajya Sabha answers; ERA5 and ECMWF IFS via Open-Meteo; pvlib; OpenStreetMap; datameet boundaries; Kaggle "Solar Power Generation Data".</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+"use strict";
+const S = { meta: null, h: 1, bytes: {}, totals: {}, mode: "status", sel: null, charts: {}, dayIdx: 0, hour: 13 };
+const HOUR = 3600e3, IST = 5.5 * HOUR, DAY = 24 * HOUR;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 0) => v == null || isNaN(v) ? "–" : v.toLocaleString("en-IN", { maximumFractionDigits: d, minimumFractionDigits: d });
+const NAMES = { bl_persistence: "Persistence", bl_smart: "Smart persistence", bl_climatology: "Climatology", bl_nwp_physics: "ECMWF + physics",
+  ridge: "Ridge", random_forest: "Random Forest", xgboost_gpu: "XGBoost (GPU)", lightgbm: "LightGBM", lstm: "LSTM (GPU)", gru: "GRU (GPU)",
+  ensemble_lgbm_gru: "LightGBM + GRU" };
+
+// ------------------------------------------------------------ data
+async function getJSON(u) { const r = await fetch(u); if (!r.ok) throw new Error(`${u}: ${r.status}`); return r.json(); }
+async function bytesFor(h) {
+  if (!S.bytes[h]) {
+    const j = await getJSON(`data/h${h}.json`);
+    const bin = atob(j.data), u = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    S.bytes[h] = u;
+  }
+  return S.bytes[h];
+}
+const SER = { y: 0, lightgbm: 1, gru: 2, bl_smart: 3, lo: 4, hi: 5 };
+function val(u, p, s, t) { const M = S.meta; return u[(p * 6 + s) * M.n_hours + t] / M.scale; }
+function mw(u, pIdx, s, t0, n) {            // MW summed over parks, hours t0..t0+n
+  const out = new Float64Array(n);
+  for (const p of pIdx) { const c = S.cap[p]; for (let i = 0; i < n; i++) out[i] += val(u, p, s, t0 + i) * c; }
+  return out;
+}
+// time: index i is the hour ending at t0 + i h (UTC); IST = +5:30
+const istOf = i => new Date(S.t0 + i * HOUR + IST);
+const dayKey = d => d.toISOString().slice(0, 10);
+function firstIndexOfDay(key) { const ms = Date.parse(key + "T00:00:00Z") - IST - S.t0; return Math.max(0, Math.ceil(ms / HOUR)); }
+const hhmm = i => { const d = istOf(i); return String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0"); };
+// each value is the mean of the hour ENDING at the stamp; UTC hours end at :30 in IST
+function label(i) { const d = istOf(i); return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" }) + " " + hhmm(i); }
+function alpha(hex, a) { const n = parseInt(hex.replace("#", ""), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
+
+// ------------------------------------------------------------ charts
+function lineChart(id, labels, sets, band) {
+  if (S.charts[id]) S.charts[id].destroy();
+  const ds = [];
+  if (band) {
+    ds.push({ label: "80% range", data: band.hi, borderWidth: 0, pointRadius: 0, backgroundColor: css("--sky-soft"), fill: "+1", order: 9 });
+    ds.push({ label: "_lo", data: band.lo, borderWidth: 0, pointRadius: 0, fill: false, order: 9 });
+  }
+  for (const s of sets) ds.push({ label: s.label, data: s.data, borderColor: s.color, backgroundColor: s.color, borderWidth: s.w || 2,
+    borderDash: s.dash || [], pointRadius: 0, tension: 0.25, fill: false, order: s.order || 1 });
+  S.charts[id] = new Chart($(id), { type: "line", data: { labels, datasets: ds }, options: baseOpts({
+    plugins: { legend: { labels: { filter: it => !it.text.startsWith("_") } }, tooltip: { mode: "index", intersect: false,
+      filter: it => !it.dataset.label.startsWith("_"), callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)} MW` } } },
+    scales: { x: { ticks: { maxTicksLimit: 8, maxRotation: 0 } }, y: { beginAtZero: true, title: { display: true, text: "MW" } } } }) });
+}
+function baseOpts(extra) {
+  const ink = css("--muted"), grid = css("--line");
+  Chart.defaults.font.family = css("--f-body").split(",")[0].replace(/"/g, "");
+  const o = { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: "index", intersect: false },
+    plugins: { legend: { position: "top", align: "start", labels: { color: ink, boxWidth: 12, boxHeight: 12, usePointStyle: true } } },
+    scales: { x: { ticks: { color: ink }, grid: { color: grid, drawTicks: false } }, y: { ticks: { color: ink }, grid: { color: grid }, title: { color: ink } } } };
+  return deepMerge(o, extra || {});
+}
+function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) && a[k]) deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
+
+// ------------------------------------------------------------ horizon toggles (shared)
+function initHorizon() {
+  document.querySelectorAll("[data-horizon]").forEach(seg => {
+    seg.innerHTML = [1, 3, 6].map(h => `<button aria-pressed="${h === S.h}" data-h="${h}">${h} h</button>`).join("");
+    seg.addEventListener("click", async e => { const b = e.target.closest("button"); if (!b) return; S.h = +b.dataset.h; syncHorizon(); await renderAll(); });
+  });
+}
+function syncHorizon() { document.querySelectorAll("[data-horizon] button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.h === S.h)); }
+
+// ------------------------------------------------------------ overview
+const STATUS = { "Completed": ["ok", "--teal", "Generating (complete)"], "Partially commissioned": ["part", "--sun", "Partly generating"],
+  "Under implementation": ["plan", "--hollow", "Under construction"], "Dropped/revised by 2026": ["drop", "--grey", "Dropped / revised"] };
+
+function buildMap() {
+  const svg = $("map"), M = S.meta;
+  const states = M.outlines.map(o => `<path class="state" d="${o.d}"><title>${o.name}</title></path>`).join("");
+  // one marker per location (co-located parks share coordinates)
+  const locs = new Map();
+  M.parks.filter(p => p.x != null).forEach(p => { const k = `${p.x.toFixed(1)},${p.y.toFixed(1)}`; (locs.get(k) || locs.set(k, []).get(k)).push(p); });
+  S.locs = [...locs.values()];
+  const mk = S.locs.map((g, i) => {
+    const cap = g.reduce((s, p) => s + p.sanctioned, 0);
+    const r = (3.2 + Math.sqrt(cap) / 5.5).toFixed(1);
+    const nm = g.map(p => p.name.replace(" Solar Park", "")).join(", ");
+    return `<circle class="mk" data-i="${i}" cx="${g[0].x.toFixed(1)}" cy="${g[0].y.toFixed(1)}" r="${r}" tabindex="0" role="button" aria-label="${nm}"><title>${nm}</title></circle>`;
+  }).join("");
+  svg.innerHTML = `<g>${states}</g><g id="mk">${mk}</g>`;
+  svg.addEventListener("click", e => { const c = e.target.closest(".mk"); if (c) selectLoc(+c.dataset.i); });
+  svg.addEventListener("keydown", e => { const c = e.target.closest(".mk"); if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectLoc(+c.dataset.i); } });
+}
+
+function parkErr(u, p) {   // nRMSE % over hours with output, computed in the page from the packed series
+  let se = 0, n = 0;
+  for (let t = 0; t < S.meta.n_hours; t++) { const y = val(u, p, 0, t), f = val(u, p, 1, t); if (y > 0.02 || f > 0.02) { se += (f - y) ** 2; n++; } }
+  return n ? 100 * Math.sqrt(se / n) : null;
+}
+
+async function renderOverview() {
+  const u = await bytesFor(S.h), M = S.meta;
+  const t = Math.min(M.n_hours - 1, firstIndexOfDay(S.dayKey) + S.hour);
+  $("ov-hour-lbl").textContent = `${hhmm(t - 1)}–${hhmm(t)}`;
+  if (!S.err) S.err = {};
+  if (!S.err[S.h]) S.err[S.h] = M.modelled.map((_, p) => parkErr(u, p));
+  const errs = S.err[S.h].filter(v => v != null), emin = Math.min(...errs), emax = Math.max(...errs);
+  document.querySelectorAll("#mk .mk").forEach(c => {
+    const g = S.locs[+c.dataset.i], st = STATUS[g[0].status] || STATUS["Under implementation"];
+    const pi = g.map(p => S.pidx[p.id]).filter(v => v != null);
+    let out = 0, cap = 0;
+    pi.forEach(p => { out += val(u, p, 0, t) * S.cap[p]; cap += S.cap[p]; });
+    const share = cap ? out / cap : 0;
+    let color = css(st[1]);
+    if (S.mode === "error" && pi.length) {
+      const e = pi.reduce((s, p) => s + S.err[S.h][p], 0) / pi.length;
+      const k = (e - emin) / ((emax - emin) || 1);
+      color = `color-mix(in srgb, ${css("--sky")} ${Math.round(25 + 75 * k)}%, ${css("--surface")})`;
+    }
+    const hollow = st[0] === "plan" || st[0] === "drop";
+    c.style.fill = hollow && S.mode === "status" ? `color-mix(in srgb, ${color} ${Math.round(18 + 50 * share)}%, transparent)` : color;
+    c.style.fillOpacity = hollow || S.mode === "error" ? 1 : (0.35 + 0.65 * share).toFixed(2);
+    c.style.stroke = color; c.style.strokeWidth = hollow ? 1.6 : 0.8;
+    c.classList.toggle("sel", S.sel === +c.dataset.i);
+  });
+  $("legend").innerHTML = S.mode === "status"
+    ? Object.values(STATUS).map(s => `<span><i style="background:${s[0] === "plan" || s[0] === "drop" ? "transparent" : css(s[1])};border:2px solid ${css(s[1])}"></i>${s[2]}</span>`).join("")
+    : `<span><i style="background:color-mix(in srgb, ${css("--sky")} 25%, ${css("--surface")})"></i>lower error (${fmt(emin, 1)}%)</span><span><i style="background:${css("--sky")}"></i>higher error (${fmt(emax, 1)}%)</span>`;
+  renderInspector(u, t);
+  // all-parks chart for the day
+  const t0 = firstIndexOfDay(S.dayKey), n = 24, all = M.modelled.map((_, p) => p);
+  const y = mw(u, all, 0, t0, n), f = mw(u, all, 1, t0, n), hw = M.halfwidth_mw[S.h] || 0;
+  lineChart("ov-total", [...Array(n)].map((_, i) => label(t0 + i)),
+    [{ label: "Actual (simulated)", data: [...y], color: css("--ink") }, { label: `LightGBM, ${S.h} h ahead`, data: [...f], color: css("--sky") }],
+    { lo: [...f].map(v => v > 0 ? Math.max(0, v - hw) : 0), hi: [...f].map(v => v > 0 ? v + hw : 0) });
+  $("ov-total-title").textContent = `All 43 parks combined · ${new Date(S.dayKey).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
+  $("ov-total-note").textContent = `Shaded: calibrated 80% range for the total (±${fmt(hw)} MW). Capacity forecast: ${fmt(S.totalCap)} MW.`;
+}
+
+function renderInspector(u, t) {
+  const el = $("inspector");
+  if (S.sel == null) { el.innerHTML = `<h3>Pick a park on the map</h3><p class="muted">Click or tab to any disc to see its details and its output at the chosen hour. Bigger discs are bigger parks.</p>`; return; }
+  const g = S.locs[S.sel], p0 = g[0], st = STATUS[p0.status] || STATUS["Under implementation"];
+  const pi = g.map(p => S.pidx[p.id]).filter(v => v != null);
+  const sum = s => pi.reduce((a, p) => a + val(u, p, s, t) * S.cap[p], 0);
+  const t0 = firstIndexOfDay(S.dayKey);
+  el.innerHTML = `
+    <div><span class="pill ${st[0]}">${st[2]}</span></div>
+    <h2>${g.map(p => p.name).join(" · ")}</h2>
+    <dl class="kv">
+      <dt>State</dt><dd>${p0.state} · ${p0.region} region</dd>
+      <dt>Developer</dt><dd>${[...new Set(g.map(p => p.sppd))].join(", ")}</dd>
+      <dt>Sanctioned</dt><dd>${fmt(g.reduce((a, p) => a + p.sanctioned, 0))} MW</dd>
+      <dt>Forecast at</dt><dd>${pi.length ? fmt(pi.reduce((a, p) => a + S.cap[p], 0)) + " MW" : "not forecast"}${g.some(p => p.tier === "U3_virtual") ? " (planned capacity)" : ""}</dd>
+      <dt>Location</dt><dd>${p0.lat.toFixed(2)}°N, ${p0.lon.toFixed(2)}°E (approx.)</dd>
+    </dl>
+    ${pi.length ? `<div class="now">
+      <div><span>Actual</span><b>${fmt(sum(0))}</b><span>MW</span></div>
+      <div><span>Forecast ${S.h} h</span><b>${fmt(sum(1))}</b><span>MW</span></div>
+      <div><span>80% range</span><b class="small">${fmt(sum(4))}–${fmt(sum(5))}</b><span>MW</span></div></div>
+      <div class="chart sm"><canvas id="insp-chart" aria-label="Output for the chosen day"></canvas></div>
+      <p class="note">Test-period error at this location: ${fmt(pi.reduce((a, p) => a + S.err[S.h][p], 0) / pi.length, 2)}% of capacity (hours with output).</p>`
+      : `<p class="muted">Not forecast: ${p0.status.startsWith("Dropped") ? "dropped or revised by 2026" : "location not verified"}.</p>`}`;
+  if (pi.length) lineChart("insp-chart", [...Array(24)].map((_, i) => label(t0 + i).slice(-5)),
+    [{ label: "Actual", data: [...mw(u, pi, 0, t0, 24)], color: css("--ink") }, { label: "Forecast", data: [...mw(u, pi, 1, t0, 24)], color: css("--sky") }],
+    { lo: [...mw(u, pi, 4, t0, 24)], hi: [...mw(u, pi, 5, t0, 24)] });
+  if (S.charts["insp-chart"]) { S.charts["insp-chart"].options.plugins.legend.display = false; S.charts["insp-chart"].update(); }
+}
+function selectLoc(i) { S.sel = i; renderOverview(); }
+
+function renderKpis() {
+  const R = S.meta.results, h = S.h;
+  const e1 = R.e1_models.filter(r => r.h === h && r.subset === "all 43 parks");
+  const lg = e1.find(r => r.model === "lightgbm"), sm = e1.find(r => r.model === "bl_smart");
+  const agg = R.e5_aggregation.find(r => r.h === h && r.subset === "all 43 parks" && r.model === "lightgbm");
+  const k = [
+    ["50", "MNRE parks in the official list · 37,990 MW sanctioned"],
+    ["43", `parks forecast · ${fmt(S.totalCap)} MW modelled`],
+    [`${fmt(lg["nRMSE_%"], 2)}%`, `typical park error, ${h} h ahead (baseline ${fmt(sm["nRMSE_%"], 2)}%)`],
+    [`${fmt(agg["all parks"], 2)}%`, "error for all parks combined"],
+    [`±${fmt(S.meta.halfwidth_mw[h])}`, "MW: calibrated 80% range for the all-parks total"],
+  ];
+  $("kpis").innerHTML = k.map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+}
+
+// ------------------------------------------------------------ park explorer
+async function renderPark() {
+  const u = await bytesFor(S.h), M = S.meta, id = $("pk-park").value, p = S.pidx[id], meta = M.parks.find(x => x.id === id);
+  const t0 = firstIndexOfDay($("pk-week").value), n = 24 * 7;
+  const c = S.cap[p];
+  const ser = s => { const a = []; for (let i = 0; i < n; i++) a.push(val(u, p, s, t0 + i) * c); return a; };
+  const lbl = [...Array(n)].map((_, i) => label(t0 + i));
+  lineChart("pk-chart", lbl, [{ label: "Actual (simulated)", data: ser(0), color: css("--ink"), order: 0 },
+    { label: "LightGBM", data: ser(1), color: css("--sky") }, { label: "GRU", data: ser(2), color: css("--sun"), dash: [5, 4], w: 1.6 },
+    { label: "Smart persistence", data: ser(3), color: css("--grey"), dash: [2, 3], w: 1.4 }], { lo: ser(4), hi: ser(5) });
+  $("pk-title").textContent = `${meta.name}, ${meta.state} · ${S.h} h ahead`;
+  const err = s => { let se = 0, k = 0; for (let t = 0; t < M.n_hours; t++) { const y = val(u, p, 0, t), f = val(u, p, s, t); if (y > 0.02 || f > 0.02) { se += (f - y) ** 2; k++; } } return 100 * Math.sqrt(se / k); };
+  let inside = 0, k = 0;
+  for (let t = 0; t < M.n_hours; t++) { const y = val(u, p, 0, t); if (y > 0.02) { k++; if (y >= val(u, p, 4, t) - 0.004 && y <= val(u, p, 5, t) + 0.004) inside++; } }
+  const st = STATUS[meta.status] || STATUS["Under implementation"];
+  $("pk-kpis").innerHTML = [
+    [`${fmt(c)} MW`, meta.tier === "U2_core" ? "commissioned capacity forecast" : "planned capacity (park under construction)"],
+    [`${fmt(err(1), 2)}%`, "LightGBM error, whole test period"],
+    [`${fmt(err(2), 2)}%`, "GRU error, whole test period"],
+    [`${fmt(err(3), 2)}%`, "baseline error, whole test period"],
+    [`${fmt(100 * inside / k, 0)}%`, "of hours inside the 80% range"],
+  ].map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("") +
+    `<div class="kpi"><span class="v" style="font-size:1rem"><span class="pill ${st[0]}">${st[2]}</span></span><span class="l">${meta.sppd}</span></div>`;
+}
+
+// ------------------------------------------------------------ totals
+async function renderTotals() {
+  const u = await bytesFor(S.h), M = S.meta, lvl = S.level || "all";
+  const name = $("tt-name").value;
+  const idx = M.modelled.map((id, p) => p).filter(p => lvl === "all" || S.park[p][lvl] === name);
+  const t0 = firstIndexOfDay($("tt-week").value), n = 24 * 7;
+  const y = [...mw(u, idx, 0, t0, n)], f = [...mw(u, idx, 1, t0, n)], cap = idx.reduce((a, p) => a + S.cap[p], 0);
+  const hw = lvl === "all" ? M.halfwidth_mw[S.h] : null;
+  lineChart("tt-chart", [...Array(n)].map((_, i) => label(t0 + i)),
+    [{ label: "Actual (simulated)", data: y, color: css("--ink") }, { label: `LightGBM, ${S.h} h ahead`, data: f, color: css("--sky") }],
+    hw ? { lo: f.map(v => v > 0 ? Math.max(0, v - hw) : 0), hi: f.map(v => v > 0 ? v + hw : 0) } : null);
+  const title = lvl === "all" ? "All 43 parks" : `${name} (${idx.length} park${idx.length > 1 ? "s" : ""})`;
+  $("tt-title").textContent = `${title} · ${fmt(cap)} MW forecast`;
+  $("tt-note").textContent = hw ? `Shaded: calibrated 80% range for the total (±${fmt(hw)} MW).`
+    : "No range is shown for regions and states: park ranges cannot simply be added, and only the all-parks total was calibrated.";
+  // whole-period error for this group
+  const yy = mw(u, idx, 0, 0, M.n_hours), ff = mw(u, idx, 1, 0, M.n_hours);
+  let se = 0, k = 0; for (let t = 0; t < M.n_hours; t++) if (yy[t] > 0) { se += (ff[t] - yy[t]) ** 2; k++; }
+  const peak = Math.max(...y);
+  $("tt-kpis").innerHTML = [[`${fmt(100 * Math.sqrt(se / k) / cap, 2)}%`, "error, whole test period (% of capacity)"],
+    [`${fmt(peak)} MW`, "peak actual output this week"], [`${idx.length}`, "parks in this group"]]
+    .map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+}
+
+function staticTotalsCharts() {
+  const R = S.meta.results, lv = ["park", "state", "region", "all parks"];
+  const col = { 1: css("--sky"), 3: css("--teal"), 6: css("--sun") };
+  if (S.charts["tt-agg"]) S.charts["tt-agg"].destroy();
+  S.charts["tt-agg"] = new Chart($("tt-agg"), { type: "line", data: { labels: ["One park", "State", "Grid region", "All parks"],
+    datasets: [1, 3, 6].map(h => { const r = R.e5_aggregation.find(x => x.h === h && x.subset === "all 43 parks" && x.model === "lightgbm");
+      return { label: `${h} h ahead`, data: lv.map(l => r[l]), borderColor: col[h], backgroundColor: col[h], pointRadius: 4, borderWidth: 2 }; }) },
+    options: baseOpts({ scales: { y: { beginAtZero: true, title: { display: true, text: "% of capacity" } } },
+      plugins: { tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y, 2)}%` } } } }) });
+  if (S.charts["tt-corr"]) S.charts["tt-corr"].destroy();
+  const c = R.e5_error_corr_vs_distance;
+  const lab = { "(0, 100]": "0–100 km", "(100, 300]": "100–300", "(300, 600]": "300–600", "(600, 1000]": "600–1,000", "(1000, 1500]": "1,000–1,500", "(1500, 3000]": "1,500+" };
+  S.charts["tt-corr"] = new Chart($("tt-corr"), { type: "bar", data: { labels: c.map(r => lab[r.band_km] || r.band_km),
+    datasets: [{ label: "error correlation", data: c.map(r => r.mean), backgroundColor: css("--sky"), borderRadius: 4 }] },
+    options: baseOpts({ plugins: { legend: { display: false } }, scales: { y: { min: -0.1, max: 0.7, title: { display: true, text: "correlation" } } } }) });
+}
+
+// ------------------------------------------------------------ results
+function renderResults() {
+  const R = S.meta.results;
+  const all = R.e1_models.filter(r => r.subset === "all 43 parks").concat(R.e1b_deep_learning.filter(r => ["lstm", "gru", "ensemble_lgbm_gru"].includes(r.model)));
+  const order = ["bl_smart", "bl_nwp_physics", "ridge", "random_forest", "xgboost_gpu", "lightgbm", "lstm", "gru", "ensemble_lgbm_gru"];
+  // [token, opacity]: baselines grey, tree models solid, neural nets lighter shades
+  const pal = { bl_smart: ["--grey", 1], bl_nwp_physics: ["--grey", .45], ridge: ["--sun", .45], random_forest: ["--teal", 1], xgboost_gpu: ["--ink", .85],
+    lightgbm: ["--sky", 1], lstm: ["--rose", .7], gru: ["--sun", 1], ensemble_lgbm_gru: ["--teal", .5] };
+  if (S.charts["rs-models"]) S.charts["rs-models"].destroy();
+  S.charts["rs-models"] = new Chart($("rs-models"), { type: "bar", data: { labels: ["1 h ahead", "3 h ahead", "6 h ahead"],
+    datasets: order.map(m => ({ label: NAMES[m], data: [1, 3, 6].map(h => (all.find(r => r.model === m && r.h === h) || {})["nRMSE_%"]),
+      backgroundColor: alpha(css(pal[m][0]), pal[m][1]), borderRadius: 3 })) },
+    options: baseOpts({ plugins: { tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y, 2)}%` } } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: "nRMSE, % of capacity" } } } }) });
+
+  const best = h => all.filter(r => r.h === h && !r.model.startsWith("bl_")).reduce((a, b) => a["nRMSE_%"] < b["nRMSE_%"] ? a : b);
+  const sm = h => all.find(r => r.h === h && r.model === "bl_smart")["nRMSE_%"];
+  const e2 = R.e2_per_park_vs_global.find(r => r.h === 1), agg = R.e5_aggregation.find(r => r.h === 1 && r.subset === "all 43 parks" && r.model === "lightgbm");
+  const e7 = R.e7_unseen_locations_detail.filter(r => r.h === 1), pen = e7.reduce((a, r) => a + (r["unseen_nRMSE_%"] / r["seen_nRMSE_%"] - 1), 0) / e7.length;
+  const cqr = R.e8_intervals.find(r => r.h === 1 && r.method.startsWith("CQR")), raw = R.e8_intervals.find(r => r.h === 1 && r.method.startsWith("LightGBM"));
+  const ramp = R.e6_ramps_regimes.find(r => r.h === 1 && r.condition.startsWith("ramp hours")), mon = R.e6_ramps_regimes.find(r => r.h === 1 && r.condition === "monsoon"),
+    non = R.e6_ramps_regimes.find(r => r.h === 1 && r.condition === "non-monsoon");
+  const phys = R.e11_real_physics_check.find(r => r.plant === "Plant 1");
+  const real = R.e11_real_forecasting, zs = real.find(r => r.plant === "Plant 1" && r.h === 1 && r.model.includes("zero-shot")),
+    rsm = real.find(r => r.plant === "Plant 1" && r.h === 1 && r.model.startsWith("Smart"));
+  const F = [
+    ["best model", `${fmt(best(1)["nRMSE_%"], 2)}%`, `1 h ahead (${NAMES[best(1).model]}), against ${fmt(sm(1), 2)}% for the baseline. At 6 h ahead the gain grows to ${fmt(100 * (1 - best(6)["nRMSE_%"] / sm(6)), 0)}%.`],
+    ["one model for all", `${e2.global_wins}/${e2.parks}`, "parks forecast better by one shared model than by a model trained for each park."],
+    ["adding parks up", `${fmt(agg.park, 1)}% → ${fmt(agg["all parks"], 1)}%`, "error for a single park versus all 43 parks combined, 1 h ahead."],
+    ["new parks", `+${fmt(100 * pen, 1)}%`, "extra error on a location the model never saw in training (1 h ahead, average)."],
+    ["honest ranges", `${fmt(cqr["PICP_%"], 1)}%`, `of hours fall inside the 80% range after conformal calibration (raw model ranges: ${fmt(raw["PICP_%"], 0)}%).`],
+    ["real plant", `${fmt(phys.corr_15min, 3)}`, `correlation between our physics model and measured output. A model trained only on simulated parks beat the baseline on the real plant (${fmt(zs["nRMSE_%"], 1)}% vs ${fmt(rsm["nRMSE_%"], 1)}%).`],
+    ["weak spot", `${fmt(ramp["lightgbm_nRMSE_%"], 0)}%`, `error during sudden cloud swings (${fmt(ramp["share_%"], 1)}% of hours), against ${fmt(R.e6_ramps_regimes.find(r => r.h === 1 && r.condition.startsWith("non-ramp"))["lightgbm_nRMSE_%"], 1)}% otherwise.`, true],
+    ["weak spot", `${fmt(mon["lightgbm_nRMSE_%"], 1)}%`, `error in the monsoon (June–September), against ${fmt(non["lightgbm_nRMSE_%"], 1)}% in other months.`, true],
+  ];
+  $("findings").innerHTML = F.map(([t, b, d, w]) => `<div class="finding${w ? " weak" : ""}"><span class="tag">${t}</span><span class="big">${b}</span><p class="small">${d}</p></div>`).join("");
+
+  const cond = R.e6_ramps_regimes.filter(r => r.h === 1 && r["share_%"] != null && !r.condition.startsWith("all"));
+  if (S.charts["rs-cond"]) S.charts["rs-cond"].destroy();
+  S.charts["rs-cond"] = new Chart($("rs-cond"), { type: "bar", data: { labels: cond.map(r => r.condition.replace(" (|dk|>0.3)", "")),
+    datasets: [{ label: "LightGBM", data: cond.map(r => r["lightgbm_nRMSE_%"]), backgroundColor: css("--sky"), borderRadius: 3 },
+      { label: "Smart persistence", data: cond.map(r => r["smart_nRMSE_%"]), backgroundColor: css("--grey"), borderRadius: 3 }] },
+    options: baseOpts({ indexAxis: "y", scales: { x: { beginAtZero: true, title: { display: true, text: "% of capacity" } } } }) });
+  const det = R.e6_ramps_regimes.find(r => r.h === 1 && r.condition.startsWith("ramp detection"));
+  $("rs-ramp-note").textContent = `Error by condition, % of capacity. Sudden swings caught in advance: ${det.condition.replace("ramp detection: ", "")} (POD = share caught).`;
+
+  const cov = R.e8_cqr_monthly_coverage, mn = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+  if (S.charts["rs-cov"]) S.charts["rs-cov"].destroy();
+  S.charts["rs-cov"] = new Chart($("rs-cov"), { data: { labels: cov.map(r => mn[r.month]), datasets: [
+    { type: "bar", label: "inside the range", data: cov.map(r => r["1"]), backgroundColor: css("--teal"), borderRadius: 3 },
+    { type: "line", label: "target 80%", data: cov.map(() => 80), borderColor: css("--ink"), borderDash: [5, 4], pointRadius: 0, borderWidth: 1.5 }] },
+    options: baseOpts({ scales: { y: { min: 60, max: 95, title: { display: true, text: "% of hours" } } } }) });
+
+  const sh = R.e4_shap_share;
+  if (S.charts["rs-shap"]) S.charts["rs-shap"].destroy();
+  S.charts["rs-shap"] = new Chart($("rs-shap"), { type: "bar", data: { labels: ["1 h ahead", "3 h ahead", "6 h ahead"],
+    datasets: sh.map((r, i) => ({ label: r.group, data: ["1", "3", "6"].map(h => r[h]), backgroundColor: css(["--sky", "--grey", "--sun", "--teal"][i]), borderRadius: 2 })) },
+    options: baseOpts({ scales: { x: { stacked: true }, y: { stacked: true, max: 100, title: { display: true, text: "% of attribution" } } } }) });
+
+  const rows = R.e11_real_forecasting, models = [...new Set(rows.map(r => r.model))];
+  const get = (m, p, h) => rows.find(r => r.model === m && r.plant === p && r.h === h)["nRMSE_%"];
+  $("rs-real").innerHTML = `<table><thead><tr><th>Model</th><th class="n">Plant 1, 1 h</th><th class="n">Plant 1, 3 h</th><th class="n">Plant 2, 1 h</th><th class="n">Plant 2, 3 h</th></tr></thead><tbody>` +
+    models.map(m => `<tr><td>${m}</td>${[["Plant 1", 1], ["Plant 1", 3], ["Plant 2", 1], ["Plant 2", 3]].map(([p, h]) => `<td class="n">${fmt(get(m, p, h), 2)}</td>`).join("")}</tr>`).join("") + "</tbody></table>";
+}
+
+// ------------------------------------------------------------ tabs + boot
+const TABS = ["overview", "parks", "totals", "results", "method"];
+async function show(tab) {
+  TABS.forEach(t => { $(t).hidden = t !== tab; $("tab-" + t).setAttribute("aria-selected", t === tab); });
+  try { localStorage.setItem("spc-tab", tab); } catch (_) {}
+  if (tab === "parks") await renderPark();
+  if (tab === "totals") { staticTotalsCharts(); await renderTotals(); }
+  if (tab === "results") renderResults();
+  if (tab === "overview") await renderOverview();
+}
+const current = () => TABS.find(t => !$(t).hidden);
+async function renderAll() { renderKpis(); await show(current()); }
+
+async function boot() {
+  S.meta = await getJSON("data/meta.json");
+  const M = S.meta;
+  S.t0 = Date.parse(M.t0_utc);
+  S.pidx = {}; M.modelled.forEach((id, p) => S.pidx[id] = p);
+  S.park = M.modelled.map(id => M.parks.find(p => p.id === id));
+  S.cap = S.park.map(p => p.cap);
+  S.totalCap = S.cap.reduce((a, b) => a + b, 0);
+  const first = dayKey(istOf(0)), last = dayKey(istOf(M.n_hours - 1));
+  S.dayKey = "2026-07-08";
+  ["ov-day", "pk-week", "tt-week"].forEach(id => { $(id).min = first; $(id).max = last; });
+  $("ov-day").value = S.dayKey; $("pk-week").value = "2026-07-06"; $("tt-week").value = "2026-07-06";
+  initHorizon(); buildMap();
+  S.sel = S.locs.findIndex(g => g.some(p => p.id === "P17"));    // Pavagada, the largest complete park
+  // park select grouped by state
+  const byState = {};
+  S.park.forEach(p => (byState[p.state] = byState[p.state] || []).push(p));
+  $("pk-park").innerHTML = Object.keys(byState).sort().map(s => `<optgroup label="${s}">${byState[s].map(p => `<option value="${p.id}">${p.name}</option>`).join("")}</optgroup>`).join("");
+  $("pk-park").value = "P17";
+
+  $("ov-day").addEventListener("change", e => { if (e.target.value) { S.dayKey = e.target.value; renderOverview(); } });
+  $("ov-hour").addEventListener("input", e => { S.hour = +e.target.value; renderOverview(); });
+  $("ov-mode").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.mode = b.dataset.v;
+    $("ov-mode").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderOverview(); });
+  ["pk-park", "pk-week"].forEach(id => $(id).addEventListener("change", renderPark));
+  $("tt-week").addEventListener("change", renderTotals);
+  $("tt-name").addEventListener("change", renderTotals);
+  $("tt-level").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.level = b.dataset.v;
+    $("tt-level").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("tt-name-wrap").hidden = S.level === "all";
+    if (S.level !== "all") { $("tt-name-lbl").textContent = S.level === "state" ? "State" : "Grid region";
+      $("tt-name").innerHTML = [...new Set(S.park.map(p => p[S.level]))].sort().map(v => `<option>${v}</option>`).join(""); }
+    renderTotals(); });
+  document.querySelector("nav.tabs").addEventListener("click", e => { const b = e.target.closest("[role=tab]"); if (b) show(b.getAttribute("aria-controls")); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => renderAll());
+  new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  let start = "overview";
+  const hash = location.hash.slice(1); if (TABS.includes(hash)) start = hash;
+  else { try { const s = localStorage.getItem("spc-tab"); if (TABS.includes(s)) start = s; } catch (_) {} }
+  renderKpis();
+  await show(start);
+}
+boot().catch(err => { $("kpis").innerHTML = `<p class="loading">Could not load the forecast data (${err.message}). Reload the page to try again.</p>`; console.error(err); });
+})();
+</script>
+</body></html>

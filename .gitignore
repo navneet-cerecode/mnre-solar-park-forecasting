@@ -1,0 +1,14 @@
+data/raw/
+data/interim/*.tmp
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+data/processed/
+catboost_info/
+site_public/
+.claude/
+report/main.pdf
+report/*backup*.tex
+report/main_before_results_update.tex
+report/*.zip
